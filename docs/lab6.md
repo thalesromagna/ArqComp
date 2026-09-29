@@ -96,7 +96,8 @@ A ULA (sem mudança desde o lab 5) calcula as 4 flags para qualquer operação:
   números que têm um mesmo sinal e se o resultado tiver o sinal contrário. Nos casos de subtração o
   raciocínio é análogo." (*Características*, seção 4.4, p. 5). O livro: "Overflow occurs in subtraction when
   we subtract a negative number from a positive number and get a negative result, or when we subtract a
-  positive number from a negative number and get a positive result." (P&H, seção 3.2, Figure 3.2, p. 192).
+  positive number from a negative number and get a positive result." (P&H, seção 3.2, p. 192; o mesmo
+  parágrafo remete à Figure 3.2, "Overflow conditions for addition and subtraction", na mesma página).
 
 Os 4 flip-flops (`ff_z`, `ff_n`, `ff_c`, `ff_v`, entidade `reg1bit`) estão no `processador.vhd`, fora da ULA:
 "Estes flip-flops ficam no top-level ou na UC, nunca dentro da ULA." (*Características*, seção 4.4,
@@ -156,12 +157,13 @@ pc_prox   <= endereco_jmp when eh_jmp='1' else
   specifies that the base for the branch address calculation is the address of the branch instruction."
   (P&H, seção 4.3, p. 264). Ex.: `BLE -3` no endereço 6 vai para 3; `BLE 2` no endereço 12 vai para 14.
 - **Complemento de 2:** o delta tem 7 bits e o PC também, então a soma `pc_atual + delta` em 7 bits (módulo
-  128) já dá o resultado certo para delta negativo; não é preciso estender o sinal. É o que o PDF garante:
-  "Se for feita extensão de sinal do operando, basta fazer normalmente a soma ao PC: ela vai funcionar, pelas
-  propriedades de complemento de 2" (*µProcessador 6*, p. 1) e "Pode continuar usando signals UNSIGNED
-  normalmente no VHDL, vai funcionar, confie" (p. 3). O livro chama isso de "PC-relative addressing", "An
-  addressing regime in which the address is the sum of the program counter (PC) and a constant in the
-  instruction" (P&H, seção 2.10, p. 122). Diferença para o RISC-V: lá o offset é deslocado 1 bit (meia
+  128) já dá o resultado certo para delta negativo: como o delta já tem a largura do PC, a "extensão de sinal"
+  para 7 bits não acrescenta nenhum bit, e por isso não há circuito de extensão (escolha da equipe). O PDF
+  garante que a soma funciona com o delta em complemento de 2: "Se for feita extensão de sinal do operando,
+  basta fazer normalmente a soma ao PC: ela vai funcionar, pelas propriedades de complemento de 2"
+  (*µProcessador 6*, p. 1) e "Pode continuar usando signals UNSIGNED normalmente no VHDL, vai funcionar, confie"
+  (p. 3). O livro chama isso de "PC-relative addressing", "An addressing regime in which the address is the
+  sum of the program counter (PC) and a constant in the instruction" (P&H, seção 2.10, p. 122). Diferença para o RISC-V: lá o offset é deslocado 1 bit (meia
   palavra); aqui cada endereço é uma instrução, então o delta é em instruções.
 - Seleção do PC por mux, como nos slides: "o PC deve ser escrito com o valor PC+delta endereços quando ambos
   é igual==1 e instr beq==1; caso contrário, devemos escrever PC+4 no PC. Isso nos dá um simples mux"

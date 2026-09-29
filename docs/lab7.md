@@ -61,10 +61,12 @@ SW Rd,(Rs)  1100 ddd sss xxxxxx     RAM[Rs(6 downto 0)] <- Rd
 As instruções são as de load/store do RISC-V (o processador de referência da disciplina), com o modo de
 endereçamento reduzido a "registrador como ponteiro":
 
-- P&H, seção 2.3 *Operands of the Computer Hardware*, **Figure 2.1, p. 70**, categoria "Data transfer":
+- P&H, **Figure 2.1, p. 70** (a figura fica na seção 2.2 *Operations of the Computer Hardware*), tabela
+  "RISC-V assembly language", categoria "Data transfer":
   linha "Load word | `lw x5, 40(x6)` | `x5 = Memory[x6 + 40]` | Word from memory to register" e linha "Store
   word | `sw x5, 40(x6)` | `Memory[x6 + 40] = x5` | Word from register to memory". A mesma tabela mostra a
-  sintaxe só com ponteiro, `lr.w x5, (x6)` (`x5 = Memory[x6]`), que é a forma `(Rs)` que adotamos.
+  sintaxe só com ponteiro na linha "Load reserved | `lr.d x5, (x6)` | `x5 = Memory[x6]`" (é uma instrução
+  atômica, citada aqui só como exemplo da notação `(Rs)` que adotamos).
 - P&H, seção 2.3, **p. 75**: "The data transfer instruction that copies data from memory to a register is
   traditionally called load. [...] The real RISC-V name for this instruction is lw, standing for load word."
 - P&H, seção 2.3, **p. 76**: "The instruction complementary to load is traditionally called store; it copies
@@ -100,13 +102,15 @@ memoria_ram: ram port map(clk=>clk, endereco=>endereco_ram_s, wr_en=>ram_wr_en_s
 Como o banco sempre lê `reg_r1 = ddd` e `reg_r2 = sss`, nenhum campo novo foi preciso: no SW, `data_r1` é o
 dado (Rd) e `data_r2` é o ponteiro (Rs); no LW, `data_r2` é o ponteiro e `reg_wr = ddd` é o destino.
 
-Base: os slides mostram a mesma ligação: "O dado escrito por uma instrução sw deve vir de um registrador lido
+Base: os slides mostram a ligação equivalente: "O dado escrito por uma instrução sw deve vir de um registrador lido
 do banco [...] Portanto, este dado estará disponível na saída inferior do banco de registradores [...] e irá
 até os pinos de dados a escrever na RAM." e "Já o dado lido por uma instrução lw vai ser colocado na saída da
 RAM que está ligada na entrada de um mux [...] Este mux irá selecionar qual dos dados será repassado ao banco
 de registradores para ser escrito" (`cap2-ciclo-unico.pdf`, seção 7.3 "RAM", p. 17). No RISC-V o endereço é
 calculado pela ULA (ponteiro + constante, p. 17); como não temos constante, o ponteiro vai direto do banco
-para a RAM e a ULA não participa.
+para a RAM e a ULA não participa. Diferença em relação aos slides (escolha da equipe): lá o dado do sw sai da
+porta inferior do banco (`data r2`, campo rs2); aqui o dado do SW sai de `data_r1` (campo `ddd`) e o ponteiro
+de `data_r2` (campo `sss`), para o SW usar os mesmos campos que o LW.
 
 ### 4.2 Mux de dados do banco
 
@@ -119,7 +123,8 @@ dado_banco_s <= ula_out_s       when sel_dado_banco_s="00" else
 ```
 
 É o MemtoReg do livro: "MemtoReg should be set to cause the data from memory to be sent to the register file."
-(P&H, seção 4.3, *Check Yourself*, p. 268) e "two 1-bit signals that are used to control multiplexors (ALUSrc
+(P&H, seção 4.3, *Check Yourself*, p. 268, alternativa I.a, que é a correta segundo as respostas do livro:
+"§4.3, page 268: I. a.", seção 4.19, p. 385) e "two 1-bit signals that are used to control multiplexors (ALUSrc
 and MemtoReg)" (Figure 4.21, p. 277). Nos slides: o seletor "deve escolher a entrada 0, vinda da RAM, apenas
 quando a instrução for lw" (`cap2-ciclo-unico.pdf`, p. 18). O nosso mux tem 4 entradas porque também passam por
 ele a constante do LD e o registrador do MOV.

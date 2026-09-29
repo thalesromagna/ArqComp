@@ -60,7 +60,7 @@ O diretório é autocontido: todos os `.vhd` necessários estão nele.
 - Todo o resto é `when-else` terminado em `else` zero (*µProcessador 2*: "Numa estrutura when-else sempre
   termine com else '0';"), `&`, recortes, `+`, `-`, `and`, `port map`.
 - Sem comentários no código. **Desvio consciente:** o `maq_estados.vhd` é o código do PDF linha por linha,
-  mas sem os dois comentários `-- se agora esta em 2`, `-- o prox vai voltar ao zero`, `-- senao avanca`,
+  mas sem os três comentários `-- se agora esta em 2`, `-- o prox vai voltar ao zero`, `-- senao avanca`,
   porque a regra da equipe é não ter comentários nos fontes. Nenhum comando foi alterado.
 
 ## 4. Codificação das instruções (formato de 16 bits)
@@ -221,7 +221,7 @@ cte_estendida <= "0000000" & instr(8 downto 0) when instr(8)='0' else
 Base: "The shortcut is to take the most significant bit from the smaller quantity—the sign bit—and replicate
 it to fill the new bits of the larger quantity. [...] This shortcut is called sign extension." (P&H, seção 2.4
 *Signed and Unsigned Numbers*, p. 85). No hardware do livro isso é o bloco Imm Gen (P&H, seção 4.4,
-Figure 4.17, p. 274, tabela "Immediate Output Bit by Bit", em que os bits altos são cópias de `i31`).
+Figure 4.18, p. 274, tabela "Immediate Output Bit by Bit", em que os bits altos são cópias de `i31`).
 
 **Seleção do próximo PC:** um mux entre "endereço do JMP" e "PC+1", como nos slides: "o PC deve ser escrito
 com o valor PC+delta endereços quando [...] caso contrário, devemos escrever PC+4 no PC. Isso nos dá um
@@ -311,8 +311,8 @@ Primeiras instruções executadas (PC durante o estado 2, IR, efeito):
 - Os PCs executados foram sempre 0,1,2 e depois o ciclo 3,4,5,6,20,21; **7 e 22 nunca aparecem**, ou seja,
   nenhuma instrução após um JMP é executada.
 - Valores de R5 após o passo D (SUB) em cada volta: **12, 19, 26, 33, 40, 47, 54, 61, 68, 75, 82**
-  (bordas 1950, 3750, 5550, 7350, 9150, 10950, 12750, 14550, 16350, 18150, 19950 ns) — a sequência pedida
-  pelo PDF (0x0C, 0x13, 0x1A, 0x21, 0x28, ...).
+  (bordas 1950, 3750, 5550, 7350, 9150, 10950, 12750, 14550, 16350, 18150, 19950 ns) e assim por diante até
+  117 (16 voltas em 30 µs) — a sequência pedida pelo PDF (0x0C, 0x13, 0x1A, 0x21, 0x28, ...).
 - Como o passo C precisa de duas instruções, R5 passa por dois valores intermediários em cada volta: primeiro
   recebe R3 (que já é igual ao R5 anterior, então não muda a partir da 2ª volta) e depois R3+R4 (13, 20, 27, ...),
   antes do SUB. Isso é consequência direta do sorteio (2 operandos), não erro.
@@ -350,7 +350,7 @@ instrucao    ADD  X ADD X    SUB    X  SUB
             ‾‾‾‾‾‾ ‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾‾ ‾‾‾‾‾‾‾
 banco_wr_en ‾‾‾‾‾‾|_____________|‾‾‾‾‾|_____
             ______ _________________ _______
-R5           13   X       20        X  19
+R5           12   X       20        X  19
             ‾‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾ ‾‾‾‾‾‾‾
 ```
 
@@ -363,7 +363,7 @@ o estado 1.)
 | Tempo (ns) | Evento |
 |---|---|
 | 3350 | borda, estado 1→2 do ADD; `pc_wr_en`=1, `banco_wr_en`=1 |
-| 3450 | borda: PC 4→5, R5 0x0D→0x14 (13→20); estado 2→0; enables→0 |
+| 3450 | borda: PC 4→5, R5 0x0C→0x14 (12→20); estado 2→0; enables→0 |
 | 3550 | borda: estado 0→1; saída da ROM passa a 0x4A40 (SUB R5,R1) |
 | 3650 | borda: estado 1→2; IR = 0x4A40; `pc_wr_en`=1; `banco_wr_en`=1; `wr_en5`=1; dado na entrada do banco = 0x13 |
 | 3750 | borda: PC 5→6; R5 0x14→0x13 (20→19); estado 2→0; enables→0 |
