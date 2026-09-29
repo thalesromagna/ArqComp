@@ -42,7 +42,7 @@ Design RISC-V Edition* (P&H), seção, figura e **página impressa**.
 | `maq_estados.vhd` | contador 0,1,2 do *µProcessador 5* |
 | `rom.vhd` | ROM síncrona de 128 x 16 bits (modelo do *µProcessador 4*) com o programa |
 | `banco.vhd` | banco com 8 registradores de 16 bits (R0..R7) |
-| `ula.vhd` | ULA de 16 bits com flags |
+| `ula.vhd` | ULA de 16 bits com flags (idêntica à do lab 2, ver `docs/lab2.md`) |
 | `un_controle.vhd` | unidade de controle, só combinacional |
 | `processador.vhd` | top-level |
 | `processador_tb.vhd` | testbench top-level (nome exigido pelo PDF) |
