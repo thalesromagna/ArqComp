@@ -54,7 +54,7 @@ Regras gerais que também valem:
 
 | Item | Onde é pedido | Situação |
 |---|---|---|
-| Largura da instrução (dado da ROM) | *µProcessador 4* e *5* ("O tamanho das instruções é sorteado") | **Pendente.** Escolha provisória: 16 bits. |
+| Largura da instrução (dado da ROM) | *µProcessador 4* ("a largura dos dados da ROM especificadas para a sua equipe") e *µProcessador 5* ("O tamanho das instruções é sorteado para a equipe") | **Pendente.** Escolha provisória: 16 bits. |
 | ROM síncrona ou assíncrona | *µProcessador 4* | **Pendente.** Escolha provisória: síncrona (modelo do próprio PDF). |
 | Registrador de instrução | *µProcessador 5* | **Pendente.** Escolha provisória: com registrador de instrução. |
 | Final do loop da validação | *Características*, seção 6.2 | **Pendente.** Não implementado. |

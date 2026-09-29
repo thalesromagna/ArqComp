@@ -69,8 +69,8 @@ port( clk,rst: in std_logic;
 
 Flip-flop T de 1 bit. O PDF manda: "use um simples flip-flop T, ou seja, aquele que troca de estado a
 cada clock" e mostra o trecho `estado <= not estado;` dentro do `elsif rising_edge(clk)`, lembrando
-"Não esqueça do reset" (*µProcessador 4*, "Máquina de Estados", p. 2). Como uma porta `out` não pode ser
-lida dentro da arquitetura, usamos o sinal interno `estado_s`, seguindo a dica do próprio PDF ("é comum
+"Não esqueça do reset" (*µProcessador 4*, "Máquina de Estados", p. 2). Como o flip-flop precisa
+ler o próprio valor (`not estado`), usamos o sinal interno `estado_s`, seguindo a dica do próprio PDF ("é comum
 usar os sufixos _i, _o e _s ... 'dado_s' para o signal interno", mesma seção) e a forma da máquina do
 *µProcessador 5*.
 

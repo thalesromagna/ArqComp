@@ -147,7 +147,7 @@ impar = (not entr2 and not entr1 and     entr0) or
 
 No mapa de Karnaugh os quatro 1s ficam em diagonal (nenhum par adjacente), então a soma de produtos não
 se simplifica. A mesma função é `entr2 xor entr1 xor entr0`; mantivemos a forma em soma de produtos
-porque o roteiro pede para "extrair uma expressão lógica" da tabela verdade e o tutorial só apresenta
+porque o roteiro pede "Faça a tabela verdade e extraia uma expressão lógica" (p. 5) e o tutorial só apresenta
 `and`, `or` e `not`.
 
 Resultado observado:
@@ -178,6 +178,8 @@ sh run.sh
 gtkwave decoder2x4_tb.ghw
 ```
 
-O `run.sh` faz `ghdl -a` de todos os fontes, `ghdl -e` de cada testbench e `ghdl -r <tb> --wave=<tb>.ghw`,
-exatamente os comandos do roteiro (seção "Como Simular", p. 3). Os arquivos `.ghw` e `work-obj*.cf`
+O `run.sh` faz `ghdl -a` de todos os fontes, `ghdl -e` de cada testbench e `ghdl -r <tb> --wave=<tb>.ghw`.
+Os comandos `ghdl -a` (p. 2) e `ghdl -r porta_tb --wave=porta_tb.ghw` (seção "Como Simular", p. 3–4) são os
+do roteiro; o `ghdl -e` explícito é escolha da equipe (o roteiro só menciona que "Um passo posterior vai fazer
+a elaboração do circuito", p. 2). Os arquivos `.ghw` e `work-obj*.cf`
 gerados não devem ser versionados.

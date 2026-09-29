@@ -60,7 +60,7 @@ Tabela verdade reduzida (no formato da tabela do mux 4x1 do roteiro, p. 1):
 | 1 | 1 | 0 | entr6 |
 | 1 | 1 | 1 | '1' (entrada 7, fixa) |
 
-A arquitetura é o `when-else` do mux 4x1 do roteiro (p. 2) estendido para 3 bits de seleção, com as
+A arquitetura é o `when-else` do mux 4x1 do roteiro (p. 1) estendido para 3 bits de seleção, com as
 entradas fixas trocadas pelas constantes `'0'` e `'1'` e terminando em `else '0'`.
 
 Testbench: percorre as 8 seleções duas vezes, a primeira com `entr2=1, entr4=0, entr6=1` e a segunda com
@@ -208,8 +208,9 @@ carry_soma <= soma_17(16); -- o carry eh o MSB da soma 17 bits
 recorte `(15 downto 0)` de cada conta.
 
 Todas as flags são calculadas sobre o sinal interno `resultado`, isto é, sobre a mesma saída do mux que
-vai para `ULA_Out`. O sinal interno é necessário porque uma porta `out` não pode ser lida dentro da própria
-arquitetura.
+vai para `ULA_Out`. O sinal interno segue o padrão dos modelos do professor, que calculam num `signal` e só
+depois ligam na porta de saída (`data_out <= registro;`, *µProcessador 3*, "VHDL Sequencial"), e a dica do
+*µProcessador 4*: "é comum usar os sufixos _i, _o e _s ... “dado_s” para o signal interno".
 
 ### 5.4 Flags
 
@@ -246,11 +247,11 @@ see if a number is positive or negative" (seção 2.4, p. 83).
 **carry (C)**:
 
 - Soma: bit 16 de `('0'&A) + ('0'&B)`, o vai-um (lab 6, "o carry eh o MSB da soma 17 bits"). É o
-  exemplo do lab 2, p. 7: "O (1) entre parênteses indica o vai-um na saída do circuito somador ... este é
+  exemplo do lab 2, p. 6: "O (1) entre parênteses indica o vai-um na saída do circuito somador ... este é
   o valor da carry flag".
 - Subtrações: bit 16 de `('0'&A) - ('0'&B)` (ou `- carry_in` estendido). Quando `A < B` (sem sinal), a
   conta em 17 bits fica negativa e o bit 16 vale 1; é o "empresta-um". Esta é a convenção do
-  *Características*, seção 4.4 (p. 6 e 7): "se R3 estiver com um valor menor do que 51, a conta gera um
+  *Características*, seção 4.4 (p. 7): "se R3 estiver com um valor menor do que 51, a conta gera um
   bit de empresta-um, ou seja, um indicador de que o resultado foi negativo. Isso indica que houve um
   estouro unsigned e portanto neste caso a flag de carry vai ser ativada". O PDF de complemento de 2 do
   Moodle (`cpl2.pdf`, seção 2.1.1, p. 4) diz o mesmo: "20-40=236 ... Se o resultado é negativo, há carry".
