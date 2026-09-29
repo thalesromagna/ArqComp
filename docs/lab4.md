@@ -7,23 +7,22 @@ registrador e de testbench, o PDF *µProcessador 3*. Todas as decisões gerais (
 O PDF resume o objetivo assim: "Vamos fazer um programa armazenado em ROM ser percorrido por um PC e
 executar jumps incondicionais" (*µProcessador 4*, p. 1, introdução).
 
-## 1. Sorteio da ROM: escolha PROVISÓRIA
+## 1. Sorteio da ROM
 
 O PDF pede: "Verifique no email com o seu sorteio para o microprocessador a largura dos dados da ROM
 especificadas para a sua equipe de laboratório. Verifique também se a ROM é síncrona ou assíncrona"
 (*µProcessador 4*, seção "ROM em VHDL", p. 2).
 
-Esse sorteio **ainda não foi recebido** (ver `docs/00-especificacoes.md`, seção 2). Até ele chegar, a
-equipe usa a escolha provisória registrada lá:
+A largura sorteada para a equipe é **16 bits**. A sincronia da ROM ainda não foi confirmada
+(ver `docs/00-especificacoes.md`, seção 2); até lá, vale a escolha provisória registrada lá:
 
-| Item | Valor provisório | Justificativa |
+| Item | Valor | Justificativa |
 |---|---|---|
-| Largura do dado da ROM | 16 bits | mesma largura dos dados do processador; codificação da seção 4 do `00-especificacoes.md` |
+| Largura do dado da ROM | 16 bits (sorteado) | sorteio da equipe; codificação da seção 4 do `00-especificacoes.md` |
 | Número de endereços | 128 (0 a 127) | "é uma ROM de 128 endereços" (*µProcessador 4*, "ROM em VHDL") |
-| Síncrona ou assíncrona | síncrona | é o modelo do próprio PDF: "Note que esta ROM é sincrona!" (*µProcessador 4*, "ROM em VHDL", p. 1) |
+| Síncrona ou assíncrona | síncrona (provisório) | é o modelo do próprio PDF: "Note que esta ROM é sincrona!" (*µProcessador 4*, "ROM em VHDL", p. 1) |
 
-Se o sorteio indicar outra largura, muda só `unsigned(15 downto 0)` na ROM, o sinal de instrução e os
-recortes de `opcode`/endereço na unidade de controle. Se indicar ROM assíncrona, basta trocar a
+Se o sorteio indicar ROM assíncrona, basta trocar a
 arquitetura da ROM pelo trecho do PDF ("basta retirar o clock e o process", *µProcessador 4*, p. 1);
 nesse caso a análise de tempo da seção 7 muda (a instrução passa a aparecer no mesmo ciclo do PC).
 

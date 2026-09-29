@@ -54,7 +54,7 @@ Regras gerais que também valem:
 
 | Item | Onde é pedido | Situação |
 |---|---|---|
-| Largura da instrução (dado da ROM) | *µProcessador 4* ("a largura dos dados da ROM especificadas para a sua equipe") e *µProcessador 5* ("O tamanho das instruções é sorteado para a equipe") | **Pendente.** Escolha provisória: 16 bits. |
+| Largura da instrução (dado da ROM) | *µProcessador 4* ("a largura dos dados da ROM especificadas para a sua equipe") e *µProcessador 5* ("O tamanho das instruções é sorteado para a equipe") | **Definido: 16 bits** (confirmado pela equipe). |
 | ROM síncrona ou assíncrona | *µProcessador 4* | **Pendente.** Escolha provisória: síncrona (modelo do próprio PDF). |
 | Registrador de instrução | *µProcessador 5* | **Pendente.** Escolha provisória: com registrador de instrução. |
 | Final do loop da validação | *Características*, seção 6.2 | **Pendente.** Não implementado. |
@@ -62,8 +62,8 @@ Regras gerais que também valem:
 | Programa de validação (crivo de Eratóstenes) | *µProcessador 7*, "Validação" | **Pendente** até o sorteio dos itens acima. |
 | Extra FPGA (primos nos displays da DE10-Lite) | `FPGA.pdf` | **Pendente.** Depende da validação e dos arquivos do professor (RAMDisp.vhd, projeto Quartus). |
 
-Quando o sorteio chegar, basta trocar a largura da ROM/instrução e reorganizar os campos da tabela da seção 4;
-o restante do circuito não muda.
+Se o sorteio indicar ROM assíncrona, basta trocar a arquitetura da ROM pelo trecho do *µProcessador 4*
+("basta retirar o clock e o process"); o restante do circuito não muda.
 
 ## 3. Organização do processador
 

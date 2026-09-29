@@ -32,8 +32,8 @@ sh run.sh
 
 ## Pendências (aguardando sorteio do professor)
 
-- Largura da instrução, ROM síncrona/assíncrona e registrador de instrução: usamos provisoriamente
-  16 bits, ROM síncrona e registrador de instrução.
+- ROM síncrona/assíncrona e registrador de instrução: usamos provisoriamente ROM síncrona e
+  registrador de instrução. (A largura da instrução é 16 bits, já definida.)
 - Validação (crivo de Eratóstenes) com os itens sorteados de final de loop e complicação.
 - Extra da FPGA (primos nos displays da DE10-Lite).
 
