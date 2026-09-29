@@ -7,7 +7,7 @@ Arquivos em `lab3/`:
 | `reg16bits.vhd` | registrador de 16 bits (modelo `reg8bits` do PDF, alargado) |
 | `banco.vhd` | banco com 8 registradores R0..R7, instancia `reg16bits` 8 vezes |
 | `ula.vhd` | ULA do lab 2 (mesma entidade usada em `lab2/`) |
-| `banco_ula.vhd` | top level: banco + ULA + muxes para a ISA ortogonal |
+| `banco_ula.vhd` | top level: banco + ULA + muxes para a ISA ortogonal (arquivo do Thales na `main`, ajustado) |
 | `reg16bits_tb.vhd`, `banco_tb.vhd`, `banco_ula_tb.vhd` | testbenches |
 | `run.sh` | análise, elaboração e simulação com GHDL |
 
@@ -42,7 +42,8 @@ Do *µProcessador 3*:
 ## 2. Código recebido do colega (Thales) e correções
 
 Na raiz do repositório estavam `reg16bits.vhd`, `banco.vhd` e `banco_tb.vhd` (e `ula.vhd`/`ula_tb.vhd`, do lab 2,
-que não foram tocados aqui). Os arquivos da raiz não foram alterados; as versões corrigidas estão em `lab3/`.
+que não foram tocados aqui). Depois o Thales subiu na branch `main` o top level `banco_ula.vhd`.
+As versões corrigidas estão em `lab3/`.
 
 | Arquivo | O que havia | O que foi feito em `lab3/` |
 |---|---|---|
@@ -50,7 +51,28 @@ que não foram tocados aqui). Os arquivos da raiz não foram alterados; as vers�
 | `banco.vhd` | 8 instâncias de `reg16bits`, decodificador de escrita com `when-else` (um `wr_en_regN` por registrador) e dois muxes de leitura `when-else` terminando em `"0000000000000000"`. Interface igual à exigida. Funcionalmente correto. | Mantido (nomes e ordem das portas iguais); só indentação/tabulações. |
 | `banco_tb.vhd` | 1) **Não compilava**: `wait 100 ns;` (falta o `for`). O GHDL acusa `banco_tb.vhd:93:22:error: 'on', 'until', 'for' or ';' expected`. 2) Tinha comentários `--` copiados do PDF (a equipe decidiu não ter comentários no código). 3) Só escrevia R1, R2 e R7; não testava R0, R3..R6, nem leitura de todos os registradores, nem a escrita durante o reset. | Reescrito: reset explícito (`reset_global`), escrita em todos os 8 registradores, leitura dupla de todos, teste de `wr_en='0'`, leitura do mesmo registrador nas duas portas, e escrita/leitura no mesmo ciclo. |
 | (não havia) | Não existia testbench do registrador, pedido na seção "Registrador Padrão". | Criado `reg16bits_tb.vhd`. |
-| (não havia) | Não existia top level banco + ULA. | Criado `banco_ula.vhd` e `banco_ula_tb.vhd`. |
+| `banco_ula.vhd` (branch `main`) | Top level com o banco, a ULA, o mux `ula_b` (entrada B da ULA: `data_r2` ou `constante`) e o mux `data_wr` (entrada do banco: resultado da ULA ou `constante`), saídas `ula_out`, `data_r1`, `data_r2` e as quatro flags. Estrutura correta para a ISA ortogonal. | Passou a ser o `lab3/banco_ula.vhd`, com o mínimo de mudanças (mesmos nomes, ordem e estilo; tabulações trocadas por espaços e fim de linha CRLF por LF). Os ajustes estão na lista logo abaixo. |
+| `banco_ula_tb.vhd` (raiz) | Testbench feito para a versão da `main`. | Unificado com os casos de teste que já existiam em `lab3/banco_ula_tb.vhd` num único `lab3/banco_ula_tb.vhd` para a nova interface (seção 8); o arquivo da raiz foi removido. |
+
+Ajustes no `banco_ula.vhd` do Thales:
+
+1. **`carry_in` no component `ula` e no top level.** O component `ula` do arquivo não tinha a porta `carry_in`,
+   mas a nossa ULA (`lab3/ula.vhd`, a mesma do lab 2) tem, porque o sorteio inclui SUBB: "SUBB R1,R2 irá realizar
+   R1 ← R1 − R2 − Cf" (*Características*, seção 4.3, p. 4). Com o component antigo o GHDL avisa
+   `IN port "carry_in" must be connected (or have a default value)` e a entrada fica indefinida, estragando a
+   operação `controle = "10"`. Foi acrescentado `carry_in` no component, no `port map` da ULA e como porta de entrada
+   do `banco_ula`. Neste lab ele vem do testbench; no lab 6 virá do flip-flop C ("Os Flip-flops das Flags",
+   *µProcessador 6*). O *µProcessador 3* permite deixar o SUBB para depois ("Por enquanto pode ignorar a
+   implementação de “SUB com borrow” se foi sorteado", p. 5), mas a porta é necessária para ligar a nossa ULA.
+2. **`sel_data_wr` com 2 bits e entrada `data_r2` no mux do banco.** O mux de `data_wr` só tinha resultado da ULA e
+   constante; faltava o caminho do `MOV Rn,Rm`, obrigatório na ISA ortogonal: "No caso ortogonal, deverá ser
+   implementada uma instrução MOV Rn,Rm, que faz Rn ← Rm para Rn e Rm pertencentes ao banco" (*Características*,
+   seção 2, p. 3) e "instruções MOV de cópia de registrador também exigem MUX" (*µProcessador 3*, "Ligando os
+   Registradores a uma ULA", p. 6). Agora `sel_data_wr` é `unsigned(1 downto 0)`: `"00"` resultado da ULA, `"01"`
+   constante (LD direto), `"10"` `data_r2`, e o `when-else` continua terminando em `"0000000000000000"`.
+3. As saídas `data_r1` e `data_r2` foram mantidas: não atrapalham e ajudam a ver no testbench o que o banco está lendo.
+
+Não foi encontrado outro erro no arquivo.
 
 ---
 
@@ -191,9 +213,9 @@ anterior." (*µProcessador 3*, p. 7).
 |---|---|---|
 | ADD, SUB, SUBB, CMPR | A = Rd, B = Rs | `sel_ula_b = '0'` (B = `data_r2`) |
 | CMPI Rd,cte | B = constante | `sel_ula_b = '1'` (B = `constante`) — **mux na entrada B da ULA** |
-| ADD, SUB, SUBB | gravar resultado da ULA | `sel_dado = "00"` |
-| LD Rd,cte | gravar a constante sem passar pela ULA | `sel_dado = "01"` — **mux na entrada de dados do banco** |
-| MOV Rd,Rs | gravar `data_r2` | `sel_dado = "10"` |
+| ADD, SUB, SUBB | gravar resultado da ULA | `sel_data_wr = "00"` |
+| LD Rd,cte | gravar a constante sem passar pela ULA | `sel_data_wr = "01"` — **mux na entrada de dados do banco** |
+| MOV Rd,Rs | gravar `data_r2` | `sel_data_wr = "10"` |
 
 Como ADD/SUB/SUBB têm dois operandos ("o primeiro operando é tanto fonte como destino ... SUB R5,R1 faz
 R5←R5-R1 (ortogonal)", *µProcessador 3*, p. 5), usamos sempre `reg_wr = reg_r1 = Rd` e `reg_r2 = Rs`.
@@ -216,7 +238,8 @@ A ULA nunca recebe constante em ADD/SUB (sorteio: "ADD apenas entre registradore
             |     |    R0 .. R7       |  +-->| 1     |                 |
             |     |                   |      |  mux  |--- B ---+       |
             |     |           data_r2 |--+-->| 0     |         |       |
-            |     |                   |  |   +-------+      +--v---+   |
+            |     |                   |  |   +-------+         |       |
+            |     |                   |  |                  +--v---+   |
             |     |           data_r1 |--|------------ A -->| ULA  |<--- controle, carry_in
             |     |                   |  |                  +--+---+   |
             |     | data_wr           |  |                     |       |
@@ -228,22 +251,31 @@ A ULA nunca recebe constante em ADD/SUB (sorteio: "ADD apenas entre registradore
                   |  00   |<-----------------------------------+
                   +---^---+
                       |
-                   sel_dado
+                 sel_data_wr
 ```
+
+As saídas do banco também saem do top level como `data_r1` e `data_r2` (só para observação no testbench).
 
 ### Interface do top level
 
 ```
-entity banco_ula is port( clk, rst, wr_en        : in std_logic;
-                          reg_wr, reg_r1, reg_r2 : in unsigned(2 downto 0);
-                          controle               : in unsigned(1 downto 0);
-                          sel_ula_b              : in std_logic;
-                          sel_dado               : in unsigned(1 downto 0);
-                          constante              : in unsigned(15 downto 0);
-                          carry_in               : in std_logic;
-                          ula_out                : out unsigned(15 downto 0);
-                          zero, carry, overflow, sinal : out std_logic);
+entity banco_ula is
+    port ( reg_wr, reg_r1, reg_r2   : in unsigned (2 downto 0);
+          clk, wr_en, rst           : in std_logic;
+          ula_out                   : out unsigned(15 downto 0);
+          data_r1, data_r2          : out unsigned(15 downto 0);
+          constante                 : in unsigned(15 downto 0);
+          controle                  : in unsigned(1 downto 0);
+          sel_ula_b                 : in std_logic;
+          sel_data_wr               : in unsigned(1 downto 0);
+          carry_in                  : in std_logic;
+          zero, carry, overflow, sinal : out std_logic
+    );
+end entity;
 ```
+
+Sinais internos: `data_r1_int`, `data_r2_int` (saídas do banco, repassadas para `data_r1`, `data_r2`), `ula_b`
+(saída do mux da entrada B), `ula_out_int` (resultado da ULA) e `data_wr` (saída do mux da entrada do banco).
 
 A constante chega ao top já com 16 bits; a extensão de sinal da constante de 9 bits da instrução
 (*Características*, seção 3: "deverão ser sinalizadas e estar em complemento de 2, exigindo portanto extensão
@@ -251,15 +283,15 @@ de sinal") será feita no lab 5, quando a constante vier da instrução.
 
 ### Sinais de controle por instrução (o que a UC do lab 5/6 vai gerar)
 
-| Instrução | wr_en | reg_wr | reg_r1 | reg_r2 | controle | sel_ula_b | sel_dado |
+| Instrução | wr_en | reg_wr | reg_r1 | reg_r2 | controle | sel_ula_b | sel_data_wr | carry_in |
 |---|---|---|---|---|---|---|---|
-| LD Rd,cte | 1 | Rd | x | x | x | x | 01 |
-| MOV Rd,Rs | 1 | Rd | x | Rs | x | x | 10 |
-| ADD Rd,Rs | 1 | Rd | Rd | Rs | 00 | 0 | 00 |
-| SUB Rd,Rs | 1 | Rd | Rd | Rs | 01 | 0 | 00 |
-| SUBB Rd,Rs | 1 | Rd | Rd | Rs | 10 | 0 | 00 |
-| CMPR Rd,Rs | 0 | x | Rd | Rs | 01 | 0 | x |
-| CMPI Rd,cte | 0 | x | Rd | x | 01 | 1 | x |
+| LD Rd,cte | 1 | Rd | x | x | x | x | 01 | x |
+| MOV Rd,Rs | 1 | Rd | x | Rs | x | x | 10 | x |
+| ADD Rd,Rs | 1 | Rd | Rd | Rs | 00 | 0 | 00 | x |
+| SUB Rd,Rs | 1 | Rd | Rd | Rs | 01 | 0 | 00 | x |
+| SUBB Rd,Rs | 1 | Rd | Rd | Rs | 10 | 0 | 00 | C (flag) |
+| CMPR Rd,Rs | 0 | x | Rd | Rs | 01 | 0 | x | x |
+| CMPI Rd,cte | 0 | x | Rd | x | 01 | 1 | x | x |
 
 CMPR/CMPI não gravam o resultado: "realiza uma comparação subtraindo os dois operandos e alterando as flags
 ... sem gravar o resultado" (*Características*, seção 4.3), por isso `wr_en = 0`.
@@ -274,19 +306,19 @@ Não. O sorteio foi "Carrega diretamente com LD sem somar". O documento *Caracte
 R0 fixo em zero na outra opção: "Constantes gravadas por soma com registrador zero e instrução ADDI com três
 operandos (por ex., ADDI R6,R0,131), caso em que o registrador R0 deve ser fixo com o valor zero". No nosso
 caso R0 é um registrador comum (na simulação, `LD R0,2` e `MOV R0,R1` gravam R0 normalmente). A carga não
-passa pela ULA: a constante vai direto para `data_wr` pelo mux `sel_dado = "01"`.
+passa pela ULA: a constante vai direto para `data_wr` pelo mux `sel_data_wr = "01"`.
 
 **"É vital poder copiar o dado guardado no acumulador para um registrador do banco e vice-versa. Precisamos de
 MUXes para isso? Se sim, onde?"**
 Não há acumulador (ISA ortogonal). A cópia equivalente é `MOV Rn,Rm` (*µProcessador 3*, "Sorteio para a Equipe
 -- Acumulador ou Não", p. 5: "deverá ser implementada no futuro uma instrução MOV Rn,Rm"), e ela exige um mux
-na entrada de dados do banco (entrada `"10"` do mux `sel_dado`, que liga `data_r2` a `data_wr`).
+na entrada de dados do banco (entrada `"10"` do mux `sel_data_wr`, que liga `data_r2` a `data_wr`).
 
 **"Como carregar uma constante para um registrador do banco? Qual a instrução ou instruções assembly? É preciso
 mudar algo no circuito?"**
 Com uma única instrução `LD Rd,cte` (ex.: `LD R3,5`). No circuito é preciso: (1) a entrada `constante` vinda de
 fora (neste lab, do testbench; no lab 5, do campo da instrução com extensão de sinal); (2) o mux na entrada de
-dados do banco (`sel_dado = "01"`). Para o CMPI também é preciso o mux na entrada B da ULA (`sel_ula_b = '1'`).
+dados do banco (`sel_data_wr = "01"`). Para o CMPI também é preciso o mux na entrada B da ULA (`sel_ula_b = '1'`).
 
 ---
 
@@ -322,35 +354,43 @@ lidos do VCD gerado pelo GHDL 4.1 (hexadecimal).
 
 ### `banco_ula_tb` (sequência de "instruções")
 
-"ULA antes da borda" é a saída combinacional no meio do ciclo (t+40 ns), "registrador" é o valor após a borda.
+Testbench único que junta os casos do testbench que existia em `lab3/` e os do testbench da raiz (feito para a
+versão da `main`). "ULA antes da borda" é a saída combinacional no meio do ciclo (t+40 ns), "registrador" é o
+valor após a borda. A coluna `sel_data_wr` mostra a entrada do mux do banco (00 ULA, 01 constante, 10 `data_r2`).
 
-| t (ns) | instrução simulada | ULA antes da borda | Z C V N | registrador após a borda |
-|---|---|---|---|---|
-| 0–200 | reset + tentativa de `LD R1,9` | – | – | todos 0000 |
-| 200 | LD R3,5 | – | – | R3 = 0005 |
-| 300 | LD R4,8 | – | – | R4 = 0008 |
-| 400 | MOV R5,R3 | – | – | R5 = 0005 |
-| 500 | ADD R5,R4 | 000D | 0 0 0 0 | R5 = 000D (13) |
-| 600 | SUB R5,R3 | 0008 | 0 0 0 0 | R5 = 0008 |
-| 700 | CMPI R5,8 | 0000 | 1 0 0 0 | R5 = 0008 (não grava) |
-| 800 | CMPI R5,20 | FFF4 (−12) | 0 1 0 1 | R5 = 0008 |
-| 900 | CMPR R5,R4 | 0000 | 1 0 0 0 | R5 = 0008 |
-| 1000 | SUBB R5,R3 (carry_in = 1) | 0002 | 0 0 0 0 | R5 = 0002 (8 − 5 − 1) |
-| 1100 | LD R6,32767 | – | – | R6 = 7FFF |
-| 1200 | LD R7,1 | – | – | R7 = 0001 |
-| 1300 | ADD R6,R7 | 8000 | 0 0 1 1 | R6 = 8000 (overflow) |
-| 1400 | LD R1,−3 | – | – | R1 = FFFD |
-| 1500 | `wr_en = 0`, tenta gravar 1234 em R5 | – | – | R5 = 0002 (não grava) |
-| 1600 | LD R0,2 | – | – | R0 = 0002 |
-| 1700 | LD R2,6 | – | – | R2 = 0006 |
-| 1800 | MOV R0,R1 | – | – | R0 = FFFD |
-| 1900 | leitura R0,R2 com AND | 0004 (FFFD and 0006) | 0 0 0 0 | – |
-| 2000 | leitura R3,R4 (soma) | 000D (5 + 8) | – | – |
-| 2100 | leitura R5,R6 (soma) | 8002 (2 + 8000) | – | – |
-| 2200 | leitura R7,R1 (soma) | FFFE (1 + (−3)) | – | – |
+| t (ns) | instrução simulada | wr_en | sel_data_wr | data_r1 / data_r2 | ULA antes da borda | Z C V N | registrador após a borda |
+|---|---|---|---|---|---|---|---|
+| 0–200 | reset + tentativa de `LD R1,9` | 1 | 01 | – | – | – | todos 0000 |
+| 200 | LD R3,5 | 1 | 01 | – | – | – | R3 = 0005 |
+| 300 | LD R4,8 | 1 | 01 | – | – | – | R4 = 0008 |
+| 400 | MOV R5,R3 | 1 | 10 | – / 0005 | – | – | R5 = 0005 |
+| 500 | ADD R5,R4 | 1 | 00 | 0005 / 0008 | 000D | 0 0 0 0 | R5 = 000D (13) |
+| 600 | SUB R5,R3 | 1 | 00 | 000D / 0005 | 0008 | 0 0 0 0 | R5 = 0008 |
+| 700 | CMPI R5,8 (igual) | 0 | – | 0008 / – | 0000 | 1 0 0 0 | R5 = 0008 (não grava) |
+| 800 | CMPI R5,20 (menor) | 0 | – | 0008 / – | FFF4 (−12) | 0 1 0 1 | R5 = 0008 |
+| 900 | CMPI R5,3 (maior) | 0 | – | 0008 / – | 0005 | 0 0 0 0 | R5 = 0008 |
+| 1000 | CMPR R5,R4 | 0 | – | 0008 / 0008 | 0000 | 1 0 0 0 | R5 = 0008 |
+| 1100 | SUBB R4,R3 (carry_in = 0) | 1 | 00 | 0008 / 0005 | 0003 | 0 0 0 0 | R4 = 0003 (8 − 5 − 0) |
+| 1200 | SUBB R5,R3 (carry_in = 1) | 1 | 00 | 0008 / 0005 | 0002 | 0 0 0 0 | R5 = 0002 (8 − 5 − 1) |
+| 1300 | LD R6,32767 | 1 | 01 | – | – | – | R6 = 7FFF |
+| 1400 | LD R7,1 | 1 | 01 | – | – | – | R7 = 0001 |
+| 1500 | ADD R6,R7 | 1 | 00 | 7FFF / 0001 | 8000 | 0 0 1 1 | R6 = 8000 (overflow) |
+| 1600 | LD R1,−3 | 1 | 01 | – | – | – | R1 = FFFD |
+| 1700 | `wr_en = 0`, tenta gravar 1234 em R5 | 0 | 01 | – | – | – | R5 = 0002 (não grava) |
+| 1800 | LD R0,2 | 1 | 01 | – | – | – | R0 = 0002 |
+| 1900 | LD R2,6 | 1 | 01 | – | – | – | R2 = 0006 |
+| 2000 | MOV R0,R1 | 1 | 10 | – / FFFD | – | – | R0 = FFFD |
+| 2100 | AND R2,R0 | 1 | 00 | 0006 / FFFD | 0004 | 0 0 0 0 | R2 = 0004 |
+| 2200 | leitura R0,R1 (soma) | 0 | – | FFFD / FFFD | FFFA (−3 + −3) | 0 1 0 1 | – |
+| 2300 | leitura R2,R3 (soma) | 0 | – | 0004 / 0005 | 0009 | 0 0 0 0 | – |
+| 2400 | leitura R4,R5 (soma) | 0 | – | 0003 / 0002 | 0005 | 0 0 0 0 | – |
+| 2500 | leitura R6,R7 (soma) | 0 | – | 8000 / 0001 | 8001 | 0 0 0 1 | – |
+| 2600 | reset no meio da simulação, lendo R6,R7 | 0 | – | 0000 / 0000 | 0000 | 1 0 0 0 | todos 0000 |
+| 2700 | leitura R0,R7 após o reset | 0 | – | 0000 / 0000 | 0000 | 1 0 0 0 | todos 0000 |
 
-Estado final: R0 = FFFD, R1 = FFFD, R2 = 0006, R3 = 0005, R4 = 0008, R5 = 0002, R6 = 8000, R7 = 0001.
-Todos os 8 registradores foram escritos e lidos.
+Estado antes do segundo reset: R0 = FFFD, R1 = FFFD, R2 = 0004, R3 = 0005, R4 = 0003, R5 = 0002, R6 = 8000,
+R7 = 0001. Todos os 8 registradores foram escritos e lidos; as três entradas do mux `sel_data_wr` e as duas do
+mux `sel_ula_b` foram usadas; as quatro operações da ULA (00, 01, 10 com `carry_in` 0 e 1, 11) apareceram.
 
 Forma de onda do trecho ADD / SUB / CMPI / CMPI (cada coluna = 50 ns, valor do meio do intervalo; bordas de subida em 550, 650, 750, 850 ns):
 
