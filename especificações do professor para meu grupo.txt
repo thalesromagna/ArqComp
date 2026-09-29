@@ -1,0 +1,31 @@
+Email 1:
+"Olá THALES e SERGIO,
+
+Seguem as características sorteadas para a UNIDADE LÓGICO-ARITMÉTICA do processador da sua equipe. Elas incluem os seguintes saltos condicionais (que exigem certas flags da ULA).
+
+{'Saltos condicionais': ['BLE', 'BVC']}
+
+Leia com atenção, no PDF do Lab da ULA, a seção sobre flags e o apêndice! Pode implementar as flags quando quiser, desde que antes do lab 6.
+
+Juliano
+"
+
+Email 2:
+"Olá THALES e SERGIO,
+
+Seguem as características sorteadas para o BANCO DE REGISTRADORES (e conexão com a ULA) do processador da sua equipe.
+
+{'Número de registradores no banco': [8],
+ 'Acumulador ou não': 'ULA com instruções ortogonais'}
+
+{'ADD ops': 'ADD com dois operandos apenas',
+ 'Carga de constantes': 'Carrega diretamente com LD sem somar',
+ 'ADD ctes': 'ADD apenas entre registradores, nunca com constantes',
+ 'SUB ctes': 'Subtração apenas entre registradores, nunca com constantes',
+ 'Comparações': 'Comparação tanto com regs quanto ctes (CMPR/CMPI)',
+ 'Subtração': 'Tanto SUB sem borrow quanto SUBB com borrow estão presentes',
+ 'SUB ops': 'Subtração com dois operandos apenas'}
+
+Leia com atenção as seções sobre o sorteio. Erros são comuns aqui, mas você pode consertar depois com pouquíssimo retrabalho, normalmente. Qualquer coisa mande email ou converse comigo na aula,
+
+Juliano"
