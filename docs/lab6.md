@@ -66,10 +66,9 @@ SUB `00100` e JMP `01000` (absoluto). ADD e SUB passam a gravar as flags. Opcode
 (PC+1); 01011 e 01100 ficam reservados para LW e SW (lab 7).
 
 **Largura de 17 bits (Email 3).** "O tamanho das instruções é sorteado para a equipe, e é igual à largura de
-um dado da ROM." (*µProcessador 5*, "Implementação", p. 2). A codificação de 16 bits usada antes do Email 3
-ganhou um `0` à esquerda do opcode: o opcode passou a ter 5 bits (b16..b12) e os campos b11..b0
-(`ddd`, `sss`, constante de 9 bits, endereço/delta de 7 bits) continuam nas mesmas posições, então a UC só
-mudou a largura de `instr` e do `opcode` (`instr(16 downto 12)`). NOP continua sendo tudo zero (`0x00000`).
+um dado da ROM." (*µProcessador 5*, "Implementação", p. 2). O opcode tem 5 bits (b16..b12) e os campos b11..b0
+(`ddd`, `sss`, constante de 9 bits, endereço/delta de 7 bits) seguem a seção 4 do `docs/00-especificacoes.md`;
+a UC lê o opcode em `instr(16 downto 12)`. NOP continua sendo tudo zero (`0x00000`).
 A troca de opcodes é permitida: "É permitido mudar os formatos de instrução (os opcodes) em laboratórios
 posteriores." (*µProcessador 5*, "Implementação", p. 2).
 

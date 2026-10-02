@@ -353,9 +353,6 @@ Tempos gerais medidos:
   450 + 300·a. Ex.: endereço 0: PC 0→1 em 400 ns, R1 = 45 em 450 ns.
 - Todas as 83 mudanças de valor do PC aconteceram em bordas de descida, sempre no estado 2; a saída da ROM só
   mudou em bordas de subida.
-- Comparado com a versão anterior (registrador de instrução, PC na subida): a sequência de 99 instruções
-  executadas em 30 µs é a mesma, cada mudança do PC acontece 50 ns antes, e os valores e instantes de gravação
-  de todos os registradores e das flags são idênticos.
 
 Escritas na RAM (todas com `ram_wr_en = 1` só no estado 2; endereço e dado conferidos contra Rs e Rd lidos do
 banco antes da borda, sem nenhuma mudança deles durante o estado 2):

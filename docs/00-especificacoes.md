@@ -151,6 +151,6 @@ Carry na subtração: vale 1 quando há "empresta-um" (Rd < Rs, sem sinal), como
   comparações, `component`/`port map`, `type ... is array` e `to_integer` (ROM/RAM).
 - `process` e `if` **apenas** para registradores/flip-flops (o PC com `falling_edge`), ROM síncrona, RAM e a máquina de estados,
   exatamente como nos modelos dos PDFs (*µProcessador 3*: "O if-then só deve ser usado nesta disciplina para criar um registrador!").
-- Todo `when-else` termina com `else` para zero (*µProcessador 2*: "Numa estrutura when-else sempre termine com else '0';").
+- Todo `when-else` termina com `else` para zero (*µProcessador 2*, seção "Multiplexação", p. 2: "Numa estrutura when-else sempre termine com else '0';").
 - Extensão de sinal feita com `when-else` e concatenação, sem funções de biblioteca extras.
 - Sem comentários no código; as explicações ficam em `docs/`.

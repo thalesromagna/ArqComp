@@ -197,7 +197,7 @@ ns no testbench):
 
 | Estado | Nome | O que acontece | Enables ativos |
 |---|---|---|---|
-| 0 (`00`) | fetch | o PC aponta a instrução; na subida que encerra o estado 0 a ROM síncrona registra `ROM[PC]` | nenhum |
+| 0 (`00`) | fetch | a saída da ROM já é a instrução apontada pelo PC (registrada na subida que encerrou o estado 2 anterior; a primeira, `ROM[0]`, durante o reset); na subida que encerra o estado 0 a ROM síncrona relê o mesmo endereço | nenhum |
 | 1 (`01`) | decode | a saída da ROM é a instrução; a `un_controle` decodifica, o banco lê, a ULA calcula | nenhum |
 | 2 (`10`) | execute | na **descida** do meio do estado o PC recebe `pc_prox`; na **subida** que encerra o estado gravam o banco (com os sinais da instrução atual, pois a saída da ROM só muda nessa mesma borda) e a ROM já lê a próxima instrução | `pc_wr_en`, `banco_wr_en` (se a instrução escreve) |
 

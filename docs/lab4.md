@@ -105,7 +105,7 @@ sufixos _i, _o e _s ... 'dado_s' para o signal interno", mesma seção) e a form
 
 | `estado` | nome | o que acontece |
 |---|---|---|
-| 0 | fetch | `pc_wr_en = 0`; a ROM registra `ROM[PC]` na subida que encerra o estado |
+| 0 | fetch | `pc_wr_en = 0`; a saída da ROM já é a instrução apontada pelo PC (registrada na subida que encerrou o estado 1 anterior; a primeira, `ROM[0]`, durante o reset); na subida que encerra o estado 0 a ROM relê o mesmo endereço |
 | 1 | decode/execute | `pc_wr_en = 1`; a unidade de controle decodifica a instrução e o PC é escrito na **descida do meio do estado** |
 
 Reset assíncrono leva a `estado = 0` (fetch).
@@ -357,10 +357,6 @@ subidas de 350, 550 e 750 ns (fim de cada estado 1), sempre meio clock depois do
 ocupa 2 clocks, de uma subida que inicia o estado 0 até a próxima; o fetch da instrução 0 é o
 intervalo 150–250 ns (último clock do reset, já com `estado = 0` e PC = 0). Em 750 ns a ROM lê
 `ROM[6]`, que também é NOP, então no gtkwave não aparece transição nessa borda.
-
-Com o PC na subida (versão anterior deste lab) o PC mudava em 350, 550 e 750 ns e a ROM só mostrava a
-instrução nova um clock inteiro depois (450, 650 ns); com o PC na descida a distância caiu para meio
-clock e a instrução está disponível desde o começo do fetch.
 
 ## 7. Resultado da simulação (comparação com o desenho)
 
