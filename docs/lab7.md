@@ -34,14 +34,14 @@ instrução**.
 | Arquivo | Conteúdo / mudança |
 |---|---|
 | `ram.vhd` | **novo**: RAM 128 x 16 do PDF, escrita síncrona, leitura assíncrona |
-| `un_controle.vhd` | instruções LW e SW; saída `ram_wr_en`; `sel_dado_banco="11"` para LW; entrada `instr` de 17 bits, opcode de 5 bits (`instr(16 downto 12)`), sem a saída `ir_wr_en` |
+| `un_controle.vhd` | instruções LW e SW; saída `ram_wr_en`; `sel_dado_banco="11"` para LW; entrada `instr` de 17 bits, opcode de 5 bits (`instr(16 downto 12)`) |
 | `processador.vhd` | instância da RAM; entrada "11" (dado da RAM) no mux do banco; sem registrador de instrução: a saída `dado` da ROM vai direto para a UC e para a porta `instrucao` (17 bits) |
 | `rom.vhd` | dado de 17 bits (`unsigned(16 downto 0)`); programa de teste da RAM |
 | `pc.vhd` | registrador do lab 3 com `falling_edge(clk)` (PC na borda de descida) |
 | `processador_tb.vhd` | tempo de simulação de 30 µs; `instrucao` de 17 bits |
 | `programa.asm` | listagem do programa (binário de 17 bits e hexadecimal de 5 dígitos) |
 | `processador_tb.gtkw` | mesma lista de sinais dos labs 5 e 6, com `instrucao[16:0]` |
-| `run.sh` | inclui `ram.vhd`; `reg16bits.vhd` continua na lista porque o banco o usa |
+| `run.sh` | inclui `ram.vhd`; `reg16bits.vhd` está na lista porque o banco o usa |
 | `reg16bits.vhd`, `reg1bit.vhd`, `maq_estados.vhd`, `banco.vhd`, `ula.vhd` | iguais ao lab 6 |
 
 ## 3. Instruções de memória escolhidas e codificação
@@ -247,8 +247,7 @@ causes the state to be updated." (P&H, legenda da Figure 4.3, p. 259). Na borda,
 amostram os valores da instrução atual e só depois a saída da ROM troca para a próxima instrução.
 
 Forma de onda medida do `SW R2,(R1)` (endereço 2). `^` = subida, `v` = descida; `RAM[45]` é
-`conteudo_ram(45)`, observado numa cópia de depuração da RAM com um sinal de monitoramento (fora do
-repositório):
+`conteudo_ram(45)`, o sinal interno da RAM (no gtkwave, `top.processador_tb.uut.memoria_ram.conteudo_ram`):
 
 ```
 t (ns)        650  700   750   800   850   900   950  1000  1050  1100  1150
@@ -342,7 +341,10 @@ Observação: a RAM do PDF não tem reset nem valor inicial, então na simulaç�
 
 ## 6. Resultados da simulação
 
-GHDL 4.1, `processador_tb` com 30 µs; VCD conferido por script Python da equipe (fora do repositório). Tempos
+GHDL 4.1, `processador_tb` com 30 µs; valores conferidos nas formas de onda (VCD/GHW). O ghdl emite 86 avisos
+`metavalue detected` (85 de `NUMERIC_STD."="` e 1 de `NUMERIC_STD.TO_INTEGER`), todos em 0 ms: no instante
+inicial, antes do reset e da primeira borda, a instrução e o endereço da RAM ainda valem `U`. Não há avisos
+depois disso. Tempos
 de gravação = borda de subida em que o registrador ou a RAM foi gravado; tempos do PC = borda de descida.
 
 Tempos gerais medidos:
@@ -367,7 +369,7 @@ banco antes da borda, sem nenhuma mudança deles durante o estado 2):
 | 16 | `SW R0,(R5)` | 5200 (16→17) | 5250 | RAM[6] ← 33 (antes −1) |
 | 31 | `SW R5,(R3)` (laço 1) | 9700, 11200, 12700, 14200, 15700 | 9750, 11250, 12750, 14250, 15750 | RAM[100..104] ← 250, 237, 224, 211, 198 |
 
-Na cópia de depuração, `conteudo_ram` de cada um desses endereços mudou exatamente na subida indicada, para o
+No sinal interno `conteudo_ram` da RAM, cada um desses endereços muda exatamente na subida indicada, para o
 valor da tabela.
 
 Leituras da primeira parte (valores com sinal):

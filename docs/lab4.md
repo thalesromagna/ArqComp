@@ -150,8 +150,11 @@ dizem o mesmo: "O Program Counter (Contador de Programa) é apenas um registrado
 (`cap2-ciclo-unico.pdf`, seção 3.1 "WTF é um PC?", p. 6).
 
 Diferenças em relação ao livro, todas vindas do enunciado ou do sorteio:
-- somamos 1 e não 4, porque cada endereço da nossa ROM guarda uma instrução inteira (os slides explicam
-  que se soma 4 no RISC-V porque "cada instrução ocupa 4 endereços", `cap2-ciclo-unico.pdf`, p. 6);
+- somamos 1 e não 4, porque o enunciado manda: "A “contagem” vai ser dada por um circuito externo somador
+  com 1." (*µProcessador 4*, "Contador de Programa", p. 2). Cada endereço da nossa ROM guarda uma instrução
+  inteira, pois o tamanho da instrução "é igual à largura de um dado da ROM" (*µProcessador 5*,
+  "Implementação", p. 2); no RISC-V soma-se 4 porque "cada instrução ocupa 4 endereços"
+  (`cap2-ciclo-unico.pdf`, p. 6);
 - nosso PC tem `wr_en`. No livro "The program counter is a 32-bit register that is written at the end of
   every clock cycle and thus does not need a write control signal" (legenda da Figure 4.5, p. 262), mas
   lá o processador é ciclo único; aqui cada instrução leva dois clocks e o PC só pode ser escrito em um
@@ -272,8 +275,7 @@ Ligações (os pinos de saída existem só para ver os sinais no gtkwave). Não 
 ## 4. Programa de teste na ROM
 
 O PDF pede "a codificação das instruções em binário ... de preferência saltando alguns endereços para a
-frente e também fazendo um loop" (*µProcessador 4*, "Unidade de Controle com Jump", p. 3). É o mesmo
-programa de antes, recodificado em 17 bits.
+frente e também fazendo um loop" (*µProcessador 4*, "Unidade de Controle com Jump", p. 3).
 
 | End. | Assembly | Binário (17 bits) | Hex | Comentário |
 |---:|---|---|---|---|
@@ -409,9 +411,11 @@ Na simulação aparece duas vezes o aviso `NUMERIC_STD."=": metavalue detected` 
 
 ## 8. Testes dos blocos isolados
 
-Todos os testbenches seguem o modelo do *µProcessador 3* (constante `period_time` de 100 ns,
-`reset_global`, `sim_time_proc`, `clk_proc`, processo de estímulos terminando com `wait;`). O
-`un_controle_tb` não tem clock (bloco combinacional), como os testbenches do *µProcessador 1*.
+Os testbenches com clock seguem o modelo do *µProcessador 3* (constante `period_time` de 100 ns,
+`sim_time_proc` e `clk_proc`; `reset_global` em todos, menos no `rom_tb`, porque a ROM não tem reset).
+Os que precisam de estímulos (`rom_tb`, `pc_tb`, `un_controle_tb`) têm um processo que termina com `wait;`;
+nos outros o circuito anda sozinho com o clock. O `un_controle_tb` não tem clock (bloco combinacional),
+como os testbenches do *µProcessador 1*.
 Valores conferidos nos VCDs.
 
 ### `rom_tb` (sem reset, pois a ROM não tem)
@@ -449,14 +453,14 @@ liberação do reset exatamente numa descida faria o PC já gravar nessa borda.
 
 | Intervalo | rst | wr_en | data_in | Bordas no intervalo | data_out medido |
 |---|:-:|:-:|---:|---|---|
-| 0–220 ns | 1 | 1 | 5 | descidas 100 e 200 | 0 (reset vence) |
+| 0–220 ns | 1 | 1 | 5 | subidas 50 e 150, descidas 100 e 200 | 0 (reset vence) |
 | 220–320 ns | 0 | 1 | 1 | subida 250, descida 300 | 1 **em 300 ns** (nada em 250) |
 | 320–420 ns | 0 | 1 | 2 | subida 350, descida 400 | 2 **em 400 ns** |
-| 420–620 ns | 0 | 0 | 127 | descidas 500 e 600 | 2 (mantém) |
+| 420–620 ns | 0 | 0 | 127 | subidas 450 e 550, descidas 500 e 600 | 2 (mantém) |
 | 620–680 ns | 0 | 1 | 85 | **só a subida 650** | 2 (mantém: a subida não grava) |
 | 680–720 ns | 0 | 0 | 85 | descida 700 | 2 (mantém: `wr_en = 0`) |
 | 720–820 ns | 0 | 1 | 85 | subida 750, descida 800 | 85 **em 800 ns** |
-| 820–920 ns | 1 | 1 | 12 | descida 900 | 0 **em 820 ns** (reset assíncrono, fora de borda) |
+| 820–920 ns | 1 | 1 | 12 | subida 850, descida 900 | 0 **em 820 ns** (reset assíncrono, fora de borda) |
 | 920–1020 ns | 0 | 1 | 12 | subida 950, descida 1000 | 12 **em 1000 ns** |
 | 1020 ns em diante | 0 | 1 | 3 | subida 1050, descida 1100 | 3 **em 1100 ns** |
 
@@ -500,7 +504,7 @@ gtkwave processador_tb.ghw
 
 O `run.sh` analisa todos os fontes com `ghdl -a`, elabora e roda cada testbench gerando um `.ghw`
 ("rode a entidade do testbench final com, digamos, ghdl -r e_4_entradas_tb --wave=result.ghw",
-*µProcessador 3*, apêndice). Os arquivos gerados (`.ghw`, `work-obj93.cf`, executáveis) não devem ser
+*µProcessador 3*, "Apêndice: Múltiplos Arquivos Fonte", p. 8). Os arquivos gerados (`.ghw`, `work-obj93.cf`, executáveis) não devem ser
 versionados.
 
 Duração das simulações: o `sim_time_proc` leva `finished` a '1' em 2 µs nos blocos com clock e em 4 µs

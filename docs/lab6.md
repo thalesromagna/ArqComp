@@ -37,7 +37,7 @@ registrador de instruções "não usar" (Email 3).
 | Arquivo | Conteúdo / mudança em relação ao lab 5 |
 |---|---|
 | `reg1bit.vhd` | **novo**: flip-flop de 1 bit com reset e enable (modelo `reg8bits` do *µProcessador 3* com 1 bit), borda de **subida** |
-| `un_controle.vhd` | novas instruções SUBB, CMPR, CMPI, BLE, BVC; saídas `flags_wr_en` e `sel_ula_b`; entradas das flags. Email 3: `instr` de 17 bits, `opcode <= instr(16 downto 12)` (5 bits), **sem** a saída `ir_wr_en` |
+| `un_controle.vhd` | novas instruções SUBB, CMPR, CMPI, BLE, BVC; saídas `flags_wr_en` e `sel_ula_b`; entradas das flags. `instr` de 17 bits e `opcode <= instr(16 downto 12)` (5 bits), como sorteado no Email 3 |
 | `processador.vhd` | 4 flip-flops de flag (Z, N, C, V) no top-level; mux na entrada B da ULA; `carry_in` da ULA = flag C. Email 3: **sem registrador de instrução**; a saída `dado` da ROM (17 bits) vai direto na UC e no pino `instrucao` |
 | `rom.vhd` | ROM síncrona de 128 x **17 bits** (`unsigned(16 downto 0)`) com o programa do lab 6 + testes extras |
 | `pc.vhd` | registrador de 7 bits (mesmo modelo do lab 3) com `falling_edge(clk)`: PC na **descida** (Email 3) |
@@ -68,9 +68,7 @@ SUB `00100` e JMP `01000` (absoluto). ADD e SUB passam a gravar as flags. Opcode
 **Largura de 17 bits (Email 3).** "O tamanho das instruções é sorteado para a equipe, e é igual à largura de
 um dado da ROM." (*µProcessador 5*, "Implementação", p. 2). O opcode tem 5 bits (b16..b12) e os campos b11..b0
 (`ddd`, `sss`, constante de 9 bits, endereço/delta de 7 bits) seguem a seção 4 do `docs/00-especificacoes.md`;
-a UC lê o opcode em `instr(16 downto 12)`. NOP continua sendo tudo zero (`0x00000`).
-A troca de opcodes é permitida: "É permitido mudar os formatos de instrução (os opcodes) em laboratórios
-posteriores." (*µProcessador 5*, "Implementação", p. 2).
+a UC lê o opcode em `instr(16 downto 12)`. NOP é tudo zero (`0x00000`).
 
 Base de cada item:
 
@@ -109,7 +107,7 @@ Base de cada item:
 
 - **Sem registrador de instrução.** O Email 3 sorteou "Registrador de Instruções: ['não usar']" e o lab 5
   só pede o IR "Caso o seu sorteio especifique um Registrador de Instrução" (*µProcessador 5*,
-  "Implementação", p. 2). O `processador.vhd` não tem mais a instância `reg_instr` nem o `ir_wr_en`: a saída
+  "Implementação", p. 2). No `processador.vhd`, a saída
   `dado` da ROM (sinal `rom_dado_s`, 17 bits, mesmo nome dos labs 5 e 7) entra direto em `instr` da UC e sai
   no pino `instrucao`, como prevê a lista de sinais do gtkwave: "instrução (saída do Registrador de
   Instrução, ou, se não houver, da ROM)" (*µProcessador 5*, "Testes", p. 2).
@@ -225,8 +223,8 @@ pc_prox   <= endereco_jmp when eh_jmp='1' else
   `endereço do branch + delta` (ou `+1` se não salta). Isso segue a nota do PDF: "“branch 5” vai pular cinco
   instruções pra frente de onde ele está" (*µProcessador 6*, nota 1, p. 1) e o livro: "The instruction set
   architecture specifies that the base for the branch address calculation is the address of the branch
-  instruction." (P&H, seção 4.3, p. 264). Ex.: `BLE -3` no endereço 6 vai para 3; `BLE 2` no endereço 12 vai
-  para 14.
+  instruction." (P&H, seção 4.3, p. 264). Ex.: `BLE -3` no endereço 6 vai para 3; `BLE 2` no endereço 12 iria
+  para 14 se fosse tomado (no programa ele não é tomado e o PC segue para 13).
 - **Depois da descida** o PC já está no destino e `pc_prox` é recalculado com ele (no `BLE -3` tomado,
   3 + (−3) = 0, medido entre 2200 e 2250 ns), mas esse valor nunca é gravado: `pc_wr_en` cai na subida que
   encerra o estado 2 e a próxima descida já cai no estado 0. Isso vale também para o PC+1 e o JMP.
@@ -314,8 +312,7 @@ automaticamente contra o `rom.vhd`.
 
 ## 6. Resultados da simulação
 
-GHDL 4.1, `processador_tb` com 50 µs, gravando VCD numa pasta de trabalho fora do repositório; o VCD foi
-conferido por script Python da equipe (também fora do repositório). Em cada linha: **PC (descida)** = descida
+GHDL 4.1, `processador_tb` com 50 µs; valores conferidos nas formas de onda (VCD/GHW). Em cada linha: **PC (descida)** = descida
 do meio do estado 2 em que o PC mudou; **grava (subida)** = subida que encerra o estado 2, em que banco e flags
 gravaram (sempre 50 ns depois). Flags na ordem Z N C V, depois da instrução.
 

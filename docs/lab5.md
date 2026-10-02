@@ -208,7 +208,8 @@ literis" e os estados separam as bordas: PC na descida do estado 2, banco na sub
 
 O próximo PC é calculado com o PC da própria instrução (`pc_atual`), pois até a descida do estado 2 o PC ainda
 contém o endereço da instrução corrente (isso será usado nos branches do lab 6). Depois da descida o
-`pc_prox` passa a valer PC+1 do novo PC, mas isso não é gravado: a próxima descida já cai no estado 0, com
+`pc_prox` é recalculado com o novo PC (no JMP ele não muda, porque vem de `instr(6 downto 0)`), mas isso
+não é gravado: a próxima descida já cai no estado 0, com
 `pc_wr_en` em 0. Enables:
 
 ```
@@ -234,7 +235,7 @@ Interface:
 | `reg_r1`, `reg_r2`, `reg_wr` | out | 3 | `instr(11 downto 9)`, `instr(8 downto 6)`, `instr(11 downto 9)` |
 
 O opcode é `instr(16 downto 12)` (5 bits), comparado com `"00001"` (LD), `"00010"` (MOV), `"00011"` (ADD),
-`"00100"` (SUB) e `"01000"` (JMP). Os campos (b11..b0) são os mesmos de antes.
+`"00100"` (SUB) e `"01000"` (JMP). Os campos (b11..b0) seguem a seção 4 do `docs/00-especificacoes.md`.
 
 Decodificação como no *µProcessador 4*: "Para decodificar instruções, basta separar os bits do opcode em
 sinais parciais e fazer comparações simples" (seção "Unidade de Controle com Jump", p. 3). O livro diz o
@@ -343,8 +344,7 @@ Observações ligadas ao sorteio:
 ## 7. Resultados da simulação
 
 Simulação com GHDL 4.1 (`processador_tb`, 30 µs, clock de 100 ns com subidas em 50, 150, 250... ns e descidas
-em 100, 200, 300... ns, reset nos 200 ns iniciais) e conferência automática do VCD por um script Python da
-equipe (fora do repositório).
+em 100, 200, 300... ns, reset nos 200 ns iniciais) e conferência dos valores nas formas de onda (VCD/GHW).
 
 Primeiras instruções executadas. "Descida" = borda em que o PC mudou (meio do estado 2); "Subida" = borda em
 que o banco gravou (fim do estado 2); "instrução" = saída da ROM durante o estado 2:
@@ -367,9 +367,9 @@ que o banco gravou (fim do estado 2); "instrução" = saída da ROM durante o es
   saída da ROM nunca mostra `01A00` nem `01600`, ou seja, nenhuma instrução após um JMP é executada.
 - No VCD inteiro o PC só muda em bordas de descida, e `instrucao` e os registradores só mudam em bordas de
   subida.
-- `0x00000` é NOP: num teste à parte (cópia da ROM fora do repositório, com `JMP 8` no lugar de `JMP 20` para
-  passar pelos endereços 8..19), cada `00000` e também um opcode não usado (`1FBFF`, opcode 11111) deixaram
-  `banco_wr_en` em 0, nenhum registrador mudou e o PC avançou 1.
+- `0x00000` é NOP. Para conferir, troque na `rom.vhd` o `JMP 20` do endereço 6 por `JMP 8` (passando pelos
+  endereços 8..19, que são `00000`) e ponha um opcode não usado (por ex. `1FBFF`, opcode 11111) num deles:
+  em todos, `banco_wr_en` fica em 0, nenhum registrador muda e o PC avança 1.
 - Valores de R5 após o passo D (SUB) em cada volta: **12, 19, 26, 33, 40, 47, 54, 61, 68, 75, 82, 89, 96,
   103, 110, 117** (subidas de 1950, 3750, 5550, 7350, 9150, 10950, 12750, 14550, 16350, 18150, 19950,
   21750, 23550, 25350, 27150, 28950 ns; 16 voltas em 30 µs) — a sequência pedida pelo PDF (0x0C, 0x13, 0x1A,

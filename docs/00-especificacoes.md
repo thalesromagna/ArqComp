@@ -80,7 +80,8 @@ já foram sorteados (Email 3).
 
 ## 3. Organização do processador
 
-- Dados de 16 bits (*µProcessador 2*: "duas entradas de dados de 16 bits"; *µProcessador 3*: "Cada registrador tem 16 bits").
+- Dados de 16 bits (*µProcessador 2*, "Tarefa para Entregar: ULA", p. 7: "duas entradas de dados de 16 bits";
+  *µProcessador 3*, "Pinagem do Banco de Registradores", p. 5: "Cada registrador tem 16 bits").
 - ROM de 128 endereços (modelo do *µProcessador 4*) → PC de 7 bits.
 - RAM de 128 endereços × 16 bits (modelo do *µProcessador 7*), escrita síncrona e leitura assíncrona.
 - Máquina de 3 estados: fetch, decode, execute (sugestão do *µProcessador 5*, "Implementação"),
@@ -150,7 +151,7 @@ Carry na subtração: vale 1 quando há "empresta-um" (Rd < Rs, sem sinal), como
 - Só construções que aparecem nos PDFs dos labs: `when-else`, `and/or/not`, `&`, recorte de bits, `+`, `-`,
   comparações, `component`/`port map`, `type ... is array` e `to_integer` (ROM/RAM).
 - `process` e `if` **apenas** para registradores/flip-flops (o PC com `falling_edge`), ROM síncrona, RAM e a máquina de estados,
-  exatamente como nos modelos dos PDFs (*µProcessador 3*: "O if-then só deve ser usado nesta disciplina para criar um registrador!").
+  exatamente como nos modelos dos PDFs (*µProcessador 3*, "Registrador Padrão", p. 2: "O if-then só deve ser usado nesta disciplina para criar um registrador!").
 - Todo `when-else` termina com `else` para zero (*µProcessador 2*, seção "Multiplexação", p. 2: "Numa estrutura when-else sempre termine com else '0';").
 - Extensão de sinal feita com `when-else` e concatenação, sem funções de biblioteca extras.
 - Sem comentários no código; as explicações ficam em `docs/`.
