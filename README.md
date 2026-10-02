@@ -2,7 +2,8 @@
 
 Arquitetura de Computadores — UTFPR / DAELN — prof. Juliano. Equipe: Thales e Sergio.
 
-Processador de 16 bits, 8 registradores, ISA ortogonal com 2 operandos, saltos condicionais BLE e BVC,
+Processador com dados de 16 bits e instruções de 17 bits, 8 registradores, ISA ortogonal com 2 operandos,
+saltos condicionais BLE e BVC, ROM síncrona, PC na borda de descida e sem registrador de instrução,
 feito em sete laboratórios. As características sorteadas e a codificação das instruções estão em
 [`docs/00-especificacoes.md`](docs/00-especificacoes.md).
 
@@ -30,11 +31,10 @@ Requer `ghdl` e `gtkwave`. Dentro do diretório do lab:
 sh run.sh
 ```
 
-## Pendências (aguardando sorteio do professor)
+## Pendências
 
-- ROM síncrona/assíncrona e registrador de instrução: usamos provisoriamente ROM síncrona e
-  registrador de instrução. (A largura da instrução é 16 bits, já definida.)
-- Validação (crivo de Eratóstenes) com os itens sorteados de final de loop e complicação.
-- Extra da FPGA (primos nos displays da DE10-Lite).
+- Validação (crivo de Eratóstenes): aguardando o sorteio dos itens de final de loop e complicação.
+- Extra da FPGA (primos nos displays da DE10-Lite): depende da validação e dos arquivos do professor
+  (RAMDisp.vhd, projeto Quartus).
 
 Detalhes em [`docs/00-especificacoes.md`](docs/00-especificacoes.md), seção 2.

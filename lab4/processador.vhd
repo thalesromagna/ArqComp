@@ -8,7 +8,7 @@ entity processador is
          estado     : out std_logic;
          pc_wr_en   : out std_logic;
          pc_saida   : out unsigned(6 downto 0);
-         instrucao  : out unsigned(15 downto 0)
+         instrucao  : out unsigned(16 downto 0)
    );
 end entity;
 
@@ -31,12 +31,12 @@ architecture a_processador of processador is
    component rom is
       port( clk      : in std_logic;
             endereco : in unsigned(6 downto 0);
-            dado     : out unsigned(15 downto 0)
+            dado     : out unsigned(16 downto 0)
       );
    end component;
 
    component un_controle is
-      port( instr    : in unsigned(15 downto 0);
+      port( instr    : in unsigned(16 downto 0);
             estado   : in std_logic;
             pc_atual : in unsigned(6 downto 0);
             pc_wr_en : out std_logic;
@@ -46,7 +46,7 @@ architecture a_processador of processador is
 
    signal estado_s, pc_wr_en_s: std_logic;
    signal pc_s, pc_prox_s: unsigned(6 downto 0);
-   signal instrucao_s: unsigned(15 downto 0);
+   signal instrucao_s: unsigned(16 downto 0);
 begin
    maq_inst: maq_estados port map(clk=>clk, rst=>rst, estado=>estado_s);
    pc_inst: pc port map(clk=>clk, rst=>rst, wr_en=>pc_wr_en_s, data_in=>pc_prox_s, data_out=>pc_s);

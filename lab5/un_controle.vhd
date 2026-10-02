@@ -3,12 +3,11 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity un_controle is
-   port( instr          : in unsigned(15 downto 0);
+   port( instr          : in unsigned(16 downto 0);
          estado         : in unsigned(1 downto 0);
          pc_atual       : in unsigned(6 downto 0);
          pc_wr_en       : out std_logic;
          pc_prox        : out unsigned(6 downto 0);
-         ir_wr_en       : out std_logic;
          banco_wr_en    : out std_logic;
          ula_controle   : out unsigned(1 downto 0);
          sel_dado_banco : out unsigned(1 downto 0);
@@ -20,19 +19,17 @@ entity un_controle is
 end entity;
 
 architecture a_un_controle of un_controle is
-   signal opcode : unsigned(3 downto 0);
+   signal opcode : unsigned(4 downto 0);
    signal eh_ld, eh_mov, eh_add, eh_sub, eh_jmp : std_logic;
    signal pc_mais_um, endereco_jmp : unsigned(6 downto 0);
 begin
-   opcode <= instr(15 downto 12);
+   opcode <= instr(16 downto 12);
 
-   eh_ld  <= '1' when opcode="0001" else '0';
-   eh_mov <= '1' when opcode="0010" else '0';
-   eh_add <= '1' when opcode="0011" else '0';
-   eh_sub <= '1' when opcode="0100" else '0';
-   eh_jmp <= '1' when opcode="1000" else '0';
-
-   ir_wr_en <= '1' when estado="01" else '0';
+   eh_ld  <= '1' when opcode="00001" else '0';
+   eh_mov <= '1' when opcode="00010" else '0';
+   eh_add <= '1' when opcode="00011" else '0';
+   eh_sub <= '1' when opcode="00100" else '0';
+   eh_jmp <= '1' when opcode="01000" else '0';
 
    pc_wr_en <= '1' when estado="10" else '0';
 
@@ -52,7 +49,6 @@ begin
    ula_controle <= "00" when eh_add='1' else
                    "01" when eh_sub='1' else
                    "00";
-
 
    sel_dado_banco <= "01" when eh_ld='1' else
                      "10" when eh_mov='1' else

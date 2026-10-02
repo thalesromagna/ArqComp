@@ -9,7 +9,7 @@ top.processador_tb.clk
 top.processador_tb.estado[1:0]
 top.processador_tb.pc[6:0]
 @22
-top.processador_tb.instrucao[15:0]
+top.processador_tb.instrucao[16:0]
 @424
 top.processador_tb.saida_ula[15:0]
 top.processador_tb.r0[15:0]

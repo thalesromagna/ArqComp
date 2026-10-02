@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity un_controle is
-   port( instr    : in unsigned(15 downto 0);
+   port( instr    : in unsigned(16 downto 0);
          estado   : in std_logic;
          pc_atual : in unsigned(6 downto 0);
          pc_wr_en : out std_logic;
@@ -12,13 +12,13 @@ entity un_controle is
 end entity;
 
 architecture a_un_controle of un_controle is
-   signal opcode: unsigned(3 downto 0);
+   signal opcode: unsigned(4 downto 0);
    signal jump_en: std_logic;
    signal pc_mais_um: unsigned(6 downto 0);
 begin
-   opcode <= instr(15 downto 12);
+   opcode <= instr(16 downto 12);
 
-   jump_en <= '1' when opcode="1000" else
+   jump_en <= '1' when opcode="01000" else
               '0';
 
    pc_mais_um <= pc_atual + 1;

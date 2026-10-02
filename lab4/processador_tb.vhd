@@ -12,7 +12,7 @@ architecture a_processador_tb of processador_tb is
             estado     : out std_logic;
             pc_wr_en   : out std_logic;
             pc_saida   : out unsigned(6 downto 0);
-            instrucao  : out unsigned(15 downto 0)
+            instrucao  : out unsigned(16 downto 0)
       );
    end component;
 
@@ -22,7 +22,7 @@ architecture a_processador_tb of processador_tb is
    signal   estado      : std_logic;
    signal   pc_wr_en    : std_logic;
    signal   pc_saida    : unsigned(6 downto 0);
-   signal   instrucao   : unsigned(15 downto 0);
+   signal   instrucao   : unsigned(16 downto 0);
 begin
    uut: processador port map(clk=>clk, rst=>reset, estado=>estado, pc_wr_en=>pc_wr_en,
                              pc_saida=>pc_saida, instrucao=>instrucao);

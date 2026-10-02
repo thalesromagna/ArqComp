@@ -10,7 +10,7 @@ architecture a_pc_rom_tb of pc_rom_tb is
       port( clk       : in std_logic;
             rst       : in std_logic;
             pc_saida  : out unsigned(6 downto 0);
-            rom_saida : out unsigned(15 downto 0)
+            rom_saida : out unsigned(16 downto 0)
       );
    end component;
 
@@ -18,14 +18,14 @@ architecture a_pc_rom_tb of pc_rom_tb is
    signal   finished    : std_logic := '0';
    signal   clk, reset  : std_logic;
    signal   pc_saida    : unsigned(6 downto 0);
-   signal   rom_saida   : unsigned(15 downto 0);
+   signal   rom_saida   : unsigned(16 downto 0);
 begin
    uut: pc_rom port map(clk=>clk, rst=>reset, pc_saida=>pc_saida, rom_saida=>rom_saida);
 
    reset_global: process
    begin
       reset <= '1';
-      wait for period_time*2;
+      wait for 220 ns;
       reset <= '0';
       wait;
    end process;

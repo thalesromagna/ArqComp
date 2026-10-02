@@ -27,11 +27,11 @@ begin
    reset_global: process
    begin
       reset <= '1';
-      wait for period_time*2;
+      wait for 220 ns;
       reset <= '0';
-      wait for period_time*6;
+      wait for 600 ns;
       reset <= '1';
-      wait for period_time;
+      wait for 100 ns;
       reset <= '0';
       wait;
    end process;
@@ -58,11 +58,9 @@ begin
    begin
       wr_en <= '1';
       data_in <= "0000101";
-      wait for 200 ns;
-      wr_en <= '1';
+      wait for 220 ns;
       data_in <= "0000001";
       wait for 100 ns;
-      wr_en <= '1';
       data_in <= "0000010";
       wait for 100 ns;
       wr_en <= '0';
@@ -70,11 +68,13 @@ begin
       wait for 200 ns;
       wr_en <= '1';
       data_in <= "1010101";
-      wait for 100 ns;
+      wait for 60 ns;
+      wr_en <= '0';
+      wait for 40 ns;
       wr_en <= '1';
+      wait for 100 ns;
       data_in <= "0001100";
       wait for 200 ns;
-      wr_en <= '1';
       data_in <= "0000011";
       wait;
    end process;

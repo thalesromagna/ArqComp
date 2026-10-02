@@ -11,7 +11,7 @@ architecture a_processador_tb of processador_tb is
             rst       : in std_logic;
             estado    : out unsigned(1 downto 0);
             valor_pc  : out unsigned(6 downto 0);
-            instrucao : out unsigned(15 downto 0);
+            instrucao : out unsigned(16 downto 0);
             saida_ula : out unsigned(15 downto 0);
             r0, r1, r2, r3, r4, r5, r6, r7 : out unsigned(15 downto 0)
       );
@@ -21,7 +21,8 @@ architecture a_processador_tb of processador_tb is
    signal reset, clk : std_logic;
    signal estado : unsigned(1 downto 0);
    signal pc : unsigned(6 downto 0);
-   signal instrucao, saida_ula : unsigned(15 downto 0);
+   signal instrucao : unsigned(16 downto 0);
+   signal saida_ula : unsigned(15 downto 0);
    signal r0, r1, r2, r3, r4, r5, r6, r7 : unsigned(15 downto 0);
    signal finished : std_logic := '0';
 begin

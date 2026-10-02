@@ -29,3 +29,18 @@ Seguem as características sorteadas para o BANCO DE REGISTRADORES (e conexão c
 Leia com atenção as seções sobre o sorteio. Erros são comuns aqui, mas você pode consertar depois com pouquíssimo retrabalho, normalmente. Qualquer coisa mande email ou converse comigo na aula,
 
 Juliano"
+
+Email 3:
+"Olá THALES e SERGIO,
+
+Seguem as características sorteadas para a UNIDADE DE CONTROLE do processador da sua equipe.
+
+{'Largura da ROM / tamanho da instrução em bits': [17],
+ 'Incremento do PC': ['PC sensível a clock de descida'],
+ 'Leitura da ROM': ['síncrona'],
+ 'Saltos': 'Incondicional é absoluto e condicional é relativo',
+ 'Registrador de Instruções': ['não usar']}
+
+Este lab ainda não vai integrar com ULA/regs. Estou adiantando o email para quem já tiver entregue o lab anterior. Este email é para quem terminou o lab #3 e já quer ir adiantando o #4. Nos vemos no laboratório,
+
+Juliano"
