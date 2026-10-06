@@ -39,19 +39,19 @@ begin
     reset_global: process
     begin
         reset <= '1';
-        wait for period_time*2; -- espera 2 clocks, pra garantir
+        wait for period_time*2; 
         reset <= '0';
         wait;
     end process;
     
     sim_time_proc: process
     begin
-        wait for 10 us;         -- <== TEMPO TOTAL DA SIMULAÇÃO!!!
+        wait for 10 us;         
         finished <= '1';
         wait;
     end process sim_time_proc;
     clk_proc: process
-    begin                       -- gera clock até que sim_time_proc termine
+    begin                       
         while finished /= '1' loop
             clk <= '0';
             wait for period_time/2;
@@ -61,7 +61,7 @@ begin
         wait;
     end process clk_proc;
 	
-		process                          -- casos de teste
+	process                          
 	begin
 		wr_en   <= '0';
 		reg_wr  <= "000";
