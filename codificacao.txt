@@ -1,0 +1,69 @@
+Codificacao das instrucoes e programa-teste do Lab 5 (uProcessador, "Calculadora Programavel")
+Equipe Thales e Sergio - 8 registradores (R0..R7), ADD/SUB com 2 operandos
+Fonte: lab_uc/uc.vhd (decodificacao), banco_ula.vhd (caminho de dados), lab_uc/rom.vhd (programa)
+
+1. FORMATO DA INSTRUCAO (17 bits)
+
+   bit:   16 15 14 13 | 12 11 10 | 9 8 7 | 6 5 4 3 2 1 0
+          opcode (4)  | Rd       | Rs    | constante ou endereco (7)
+
+   b16..b13  opcode (4 bits)
+   b12..b10  registrador destino Rd; tambem e a fonte 1 (leitura de Rd na ULA)
+   b9..b7    registrador fonte 2 Rs
+   b6..b0    constante de 7 bits em complemento de 2 (LD), estendida com sinal
+             para 16 bits (b6 replicado nos 9 bits mais altos): faixa -64..63
+             destino do JMP: endereco absoluto da ROM, 7 bits sem sinal (0..127)
+
+   Registradores: 000=R0, 001=R1, 010=R2, 011=R3, 100=R4, 101=R5, 110=R6, 111=R7.
+   Campos que a instrucao nao usa ficam em 0 (a UC os ignora).
+
+2. TABELA DE OPCODES
+
+   Opcode  Mnemonico   Efeito                               Campos usados
+   ------  ----------  -----------------------------------  ----------------------
+   0000    NOP         nada (sem escrita); PC <- PC + 1      nenhum
+   0001    LD  Rd,cte  Rd <- cte (7 bits, sinal estendido)   Rd (b12..b10), cte (b6..b0)
+   0010    MOV Rd,Rs   Rd <- Rs                              Rd (b12..b10), Rs (b9..b7)
+   0011    ADD Rd,Rs   Rd <- Rd + Rs                         Rd (b12..b10), Rs (b9..b7)
+   0100    SUB Rd,Rs   Rd <- Rd - Rs                         Rd (b12..b10), Rs (b9..b7)
+   1111    JMP end     PC <- end (absoluto, 7 bits)          end (b6..b0)
+   demais  (nao usados) nada (sem escrita); PC <- PC + 1     nenhum
+
+   Sinais gerados pela UC (lab_uc/uc.vhd):
+   - escrita no banco (wr_en_banco): '1' somente para LD, MOV, ADD e SUB, e apenas
+     no estado '1'; NOP, JMP e opcodes nao usados nao escrevem em registrador.
+   - sel_data_wr: LD = "01" (constante); MOV = "10" (dado lido de Rs);
+     ADD/SUB e demais = "00" (saida da ULA).
+   - controle da ULA: ADD = "00" (A+B); SUB = "01" (A-B); demais = "00".
+     A ULA recebe A = Rd e B = Rs (sel_ula_b fixo em '0').
+   - jump_en: '1' somente para o opcode 1111; o PC carrega b6..b0 da instrucao.
+     Nos demais casos o PC recebe PC + 1.
+
+   Temporizacao: cada instrucao leva 2 ciclos de clock (estado 0 e 1). Com estado
+   = '1', o PC e atualizado na borda de descida e o banco grava na borda de subida
+   seguinte.
+
+3. PROGRAMA-TESTE (conteudo de lab_uc/rom.vhd)
+
+   Enderecos 8..19 e 23..127: NOP (0x00000).
+   Binario: opcode(4) Rd(3) Rs(3) cte/end(7).
+
+   End  Passo  Assembly       Binario (17 bits)     Hex    Efeito
+   ---  -----  -------------  --------------------  -----  ---------------------------
+     0   A     LD  R3,5       0001 011 000 0000101  02C05  R3 <- 5
+     1   B     LD  R4,8       0001 100 000 0001000  03008  R4 <- 8
+     2   C     MOV R5,R3      0010 101 011 0000000  05580  R5 <- R3
+     3   C     ADD R5,R4      0011 101 100 0000000  07600  R5 <- R5 + R4 (R5 = R3 + R4)
+     4   D     LD  R6,1       0001 110 000 0000001  03801  R6 <- 1 (nao ha SUBI)
+     5   D     SUB R5,R6      0100 101 110 0000000  09700  R5 <- R5 - R6 (R5 = R5 - 1)
+     6   E     JMP 20         1111 000 000 0010100  1E014  PC <- 20
+     7   F     LD  R5,0       0001 101 000 0000000  03400  R5 <- 0 (nunca executada)
+   8..19       NOP            0000 000 000 0000000  00000  (enderecos vazios da ROM)
+    20   G     MOV R3,R5      0010 011 101 0000000  04E80  R3 <- R5
+    21   H     JMP 2          1111 000 000 0000010  1E002  PC <- 2 (volta ao passo C)
+    22   I     LD  R3,0       0001 011 000 0000000  02C00  R3 <- 0 (nunca executada)
+  23..127      NOP            0000 000 000 0000000  00000  (enderecos vazios da ROM)
+
+   Resultado esperado: R3 recebe 5 e R4 recebe 8; depois, em cada volta do laco
+   (enderecos 2 a 6, 20 e 21), R5 vale 12, 19, 26, 33, 40, 47, ... ao final do SUB,
+   e R3 acompanha esse valor (passo G). O PC nunca passa pelos enderecos 7 e 22.

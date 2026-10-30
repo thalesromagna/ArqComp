@@ -29,7 +29,7 @@ architecture a_rom of rom is
 begin
    process(clk)
    begin
-      if(rising_edge(clk)) thenm
+      if(rising_edge(clk)) then
          dado <= conteudo_rom(to_integer(endereco));
       end if;
    end process;

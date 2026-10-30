@@ -90,7 +90,7 @@ begin
 		reg_wr <= "001";
 		data_wr <= "1111111111111111";
 		reg_r1 <= "001";
-		wait 100 ns;
+		wait for 100 ns;
 		
 	 
       wait;

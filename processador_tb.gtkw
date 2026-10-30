@@ -1,0 +1,22 @@
+[dumpfile] "processador_tb.ghw"
+[timestart] 0
+[size] 1600 900
+*-26.000000 0 -1
+@28
+top.processador_tb.reset
+top.processador_tb.clk
+@24
+top.processador_tb.estado
+top.processador_tb.pc[6:0]
+@22
+top.processador_tb.instrucao[16:0]
+@424
+top.processador_tb.ula_out[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg0[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg1[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg2[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg3[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg4[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg5[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg6[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg7[15:0]
