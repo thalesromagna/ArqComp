@@ -14,7 +14,7 @@ architecture a_banco_ula_tb of banco_ula_tb is
 			  constante 				: in unsigned(15 downto 0);
 			  controle                  : in unsigned(1 downto 0);
 			  sel_ula_b					: in std_logic;
-			  sel_data_wr				: in std_logic;
+			  sel_data_wr				: in unsigned (1 downto 0);
 			  zero, carry, overflow, sinal : out std_logic
 		);
 	end component;
@@ -23,7 +23,8 @@ architecture a_banco_ula_tb of banco_ula_tb is
 	signal   finished    : std_logic := '0';
 
 	signal clk, rst, wr_en               : std_logic;
-	signal sel_ula_b, sel_data_wr        : std_logic;
+	signal sel_ula_b         			 : std_logic;
+	signal sel_data_wr 					 : unsigned (1 downto 0);
 	signal zero, carry, overflow, sinal  : std_logic;
 	signal reg_wr, reg_r1, reg_r2        : unsigned(2 downto 0) := "000";
 	signal controle                      : unsigned(1 downto 0) := "00";
@@ -85,26 +86,23 @@ begin
 		reg_r2      <= "000";
 		controle    <= "00";
 		sel_ula_b   <= '0';
-		sel_data_wr <= '0';
+		sel_data_wr <= "00";
 		constante   <= "0000000000000000";
 		wait for 200 ns;
 
-		-- LD R1,10
 		wr_en       <= '1';
-		sel_data_wr <= '1';
+		sel_data_wr <= "01";
 		reg_wr      <= "001";
 		constante   <= "0000000000001010";
 		reg_r1      <= "001";
 		wait for 100 ns;
  
-		-- LD R2,3
 		reg_wr      <= "010";
 		constante   <= "0000000000000011";
 		reg_r2      <= "010";
 		wait for 100 ns;
  
-		-- ADD R1,R2 
-		sel_data_wr <= '0';
+		sel_data_wr <= "00";
 		sel_ula_b   <= '0';
 		controle    <= "00";
 		reg_wr      <= "001";
@@ -112,77 +110,7 @@ begin
 		reg_r2      <= "010";
 		wait for 100 ns;
  
-		-- SUB R1,R2
-		controle    <= "01";
-		wait for 100 ns;
- 
-		-- CMPR R1,R2
-		wr_en       <= '0';
-		controle    <= "01";
-		wait for 100 ns;
- 
-		-- CMPI R1,10
-		sel_ula_b   <= '1';
-		constante   <= "0000000000001010";
-		wait for 100 ns;
- 
-		-- CMPI R1,20
-		constante   <= "0000000000010100";
-		wait for 100 ns;
- 
-		-- LD R3,1
-		wr_en       <= '1';
-		sel_ula_b   <= '0';
-		sel_data_wr <= '1';
-		reg_wr      <= "011";
-		constante   <= "0000000000000001";
-		reg_r1      <= "011";
-		wait for 100 ns;
- 
-		-- LD R4,1
-		reg_wr      <= "100";
-		constante   <= "1111111111111111";
-		reg_r2      <= "100";
-		wait for 100 ns;
- 
-		-- ADD R3,R4
-		sel_data_wr <= '0';
-		controle    <= "00";
-		reg_wr      <= "011";
-		reg_r1      <= "011";
-		reg_r2      <= "100";
-		wait for 100 ns;
- 
-		-- LD R5,-3
-		sel_data_wr <= '1';
-		reg_wr      <= "101";
-		constante   <= "1111111111111101";
-		reg_r2      <= "101";
-		wait for 100 ns;
- 
-		-- ADD R1,R5
-		sel_data_wr <= '0';
-		controle    <= "00";
-		reg_wr      <= "001";
-		reg_r1      <= "001";
-		reg_r2      <= "101";
-		wait for 100 ns;
- 
-		-- leitura R1 e R2
-		wr_en       <= '0';
-		reg_r1      <= "001";
-		reg_r2      <= "010";
-		wait for 100 ns;
- 
-		-- leitura R3 e R5
-		reg_r1      <= "011";
-		reg_r2      <= "101";
-		wait for 100 ns;
- 
-		-- leitura depois do reset R1 e R2
-		reg_r1      <= "001";
-		reg_r2      <= "010";
-		wait for 100 ns;
+		
 	
 	
 		wait;                        

@@ -11,7 +11,7 @@ entity banco_ula is
 		  constante 				: in unsigned(15 downto 0);
 		  controle                  : in unsigned(1 downto 0);
 		  sel_ula_b					: in std_logic;
-		  sel_data_wr				: in std_logic;
+		  sel_data_wr				: in unsigned(1 downto 0);
 		  zero, carry, overflow, sinal : out std_logic
 	);
 end entity;
@@ -51,8 +51,9 @@ begin
 
 	ula1: ula port map(A => data_r1_int, B => ula_b, zero => zero, carry => carry, overflow => overflow, sinal => sinal, controle => controle, ULA_Out => ula_out_int);
 
-	data_wr <= ula_out_int when sel_data_wr='0' else
-	           constante   when sel_data_wr='1' else
+	data_wr <= ula_out_int when sel_data_wr="00" else
+	           constante   when sel_data_wr="01" else
+			   data_r2_int when sel_data_wr="10" else
 	           "0000000000000000";
 
 	data_r1 <= data_r1_int;
