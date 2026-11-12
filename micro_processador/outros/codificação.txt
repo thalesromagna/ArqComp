@@ -1,0 +1,20 @@
+  MSB b16  b12 b9  b6    b0 LSB
+      |                  |
+NOP:  0000 xxx xxx xxxxxxx
+LD:   0001 ddd xxx ccccccc
+MOV:  0010 ddd sss xxxxxxx
+ADD:  0011 ddd sss xxxxxxx
+SUB:  0100 ddd sss xxxxxxx
+BLE:  0101 xxx xxx rrrrrrr
+BVC:  0110 xxx xxx rrrrrrr
+CMPR: 0111 ddd sss xxxxxxx
+CMPI: 1000 ddd xxx ccccccc
+SUBB: 1001 ddd sss xxxxxxx
+JMP:  1111 xxx xxx eeeeeee
+
+	ddd  identifica o registrador destino 
+	sss  identifica o registrador fonte
+	ccccccc identifica a constante de 7 bits em complemento de 2
+	rrrrrrr identifica o delta do salto relativo
+	eeeeeee identifica o endereço absoluto do salto
+	xxxx é irrelevante

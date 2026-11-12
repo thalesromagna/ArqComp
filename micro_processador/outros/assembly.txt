@@ -1,0 +1,19 @@
+A:
+ld r3, 0
+
+B:
+ld r4, 0
+
+C:
+add r4, r3
+
+D:
+ld r6, 1
+add r3, r6
+
+E:
+cmpi r3, 29
+ble -4
+
+F:
+mov r5, r4
