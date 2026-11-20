@@ -8,7 +8,9 @@ end entity;
 architecture a_display_7seg_tb of display_7seg_tb is
 
     component display_7seg is
-        generic( ANODO_COMUM : boolean := true );
+        generic( ANODO_DEZENA  : boolean := true;
+                 ANODO_UNIDADE : boolean := false
+        );
         port( valor       : in  unsigned(15 downto 0);
               seg_dezena  : out std_logic_vector(6 downto 0);
               seg_unidade : out std_logic_vector(6 downto 0)
@@ -20,16 +22,21 @@ architecture a_display_7seg_tb of display_7seg_tb is
     signal uni_a  : std_logic_vector(6 downto 0);
     signal dez_c  : std_logic_vector(6 downto 0);
     signal uni_c  : std_logic_vector(6 downto 0);
+    signal dez_m  : std_logic_vector(6 downto 0);
+    signal uni_m  : std_logic_vector(6 downto 0);
 
 begin
 
     anodo: display_7seg
-        generic map( ANODO_COMUM => true )
+        generic map( ANODO_DEZENA => true, ANODO_UNIDADE => true )
         port map( valor => valor, seg_dezena => dez_a, seg_unidade => uni_a );
 
     catodo: display_7seg
-        generic map( ANODO_COMUM => false )
+        generic map( ANODO_DEZENA => false, ANODO_UNIDADE => false )
         port map( valor => valor, seg_dezena => dez_c, seg_unidade => uni_c );
+
+    misto: display_7seg
+        port map( valor => valor, seg_dezena => dez_m, seg_unidade => uni_m );
 
     process
         procedure confere(v : integer; d, u : std_logic_vector(6 downto 0)) is
@@ -40,6 +47,8 @@ begin
                 report "anodo comum errado para " & integer'image(v) severity error;
             assert dez_c = not d and uni_c = not u
                 report "catodo comum errado para " & integer'image(v) severity error;
+            assert dez_m = d and uni_m = not u
+                report "padrao (dezena anodo, unidade catodo) errado para " & integer'image(v) severity error;
         end procedure;
     begin
         confere(0,     "1111111", "1000000");

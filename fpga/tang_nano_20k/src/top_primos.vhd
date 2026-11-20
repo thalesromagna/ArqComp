@@ -4,8 +4,9 @@ use ieee.numeric_std.all;
 
 entity top_primos is
     generic( DIV_MAX     : integer := 6749;
-             PAUSA_MAX   : integer := 40499999;
-             ANODO_COMUM : boolean := true
+             PAUSA_MAX     : integer := 40499999;
+             ANODO_DEZENA  : boolean := true;
+             ANODO_UNIDADE : boolean := false
     );
     port( clk         : in  std_logic;
           rst         : in  std_logic;
@@ -42,14 +43,23 @@ architecture a_top_primos of top_primos is
     end component;
 
     component display_7seg is
-        generic( ANODO_COMUM : boolean := true );
+        generic( ANODO_DEZENA  : boolean := true;
+                 ANODO_UNIDADE : boolean := false
+        );
         port( valor       : in  unsigned(15 downto 0);
               seg_dezena  : out std_logic_vector(6 downto 0);
               seg_unidade : out std_logic_vector(6 downto 0)
         );
     end component;
 
+    component BUFG is
+        port( O : out std_logic;
+              I : in  std_logic
+        );
+    end component;
+
     signal clk_proc   : std_logic;
+    signal clk_proc_g : std_logic;
     signal r7         : unsigned(15 downto 0);
     signal r7_amostra : unsigned(15 downto 0);
     signal estado     : std_logic;
@@ -58,6 +68,10 @@ architecture a_top_primos of top_primos is
     signal ula_out    : unsigned(15 downto 0);
 
 begin
+
+    bufg_inst: BUFG
+        port map( O => clk_proc_g,
+                  I => clk_proc );
 
     relogio_inst: relogio
         generic map( DIV_MAX => DIV_MAX, PAUSA_MAX => PAUSA_MAX )
@@ -68,7 +82,7 @@ begin
                   r7_amostra => r7_amostra );
 
     processador_inst: processador
-        port map( clk       => clk_proc,
+        port map( clk       => clk_proc_g,
                   rst       => rst,
                   estado    => estado,
                   pc        => pc,
@@ -78,7 +92,7 @@ begin
                   halted    => halted );
 
     display_inst: display_7seg
-        generic map( ANODO_COMUM => ANODO_COMUM )
+        generic map( ANODO_DEZENA => ANODO_DEZENA, ANODO_UNIDADE => ANODO_UNIDADE )
         port map( valor       => r7_amostra,
                   seg_dezena  => seg_dezena,
                   seg_unidade => seg_unidade );

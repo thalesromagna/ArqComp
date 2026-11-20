@@ -10,7 +10,8 @@ architecture a_top_primos_tb of top_primos_tb is
     component top_primos is
         generic( DIV_MAX     : integer := 6749;
                  PAUSA_MAX   : integer := 40499999;
-                 ANODO_COMUM : boolean := true
+                 ANODO_DEZENA  : boolean := true;
+                 ANODO_UNIDADE : boolean := false
         );
         port( clk         : in  std_logic;
               rst         : in  std_logic;
@@ -73,7 +74,7 @@ architecture a_top_primos_tb of top_primos_tb is
 begin
 
     uut: top_primos
-        generic map( DIV_MAX => DIV_TB, PAUSA_MAX => PAUSA_TB, ANODO_COMUM => true )
+        generic map( DIV_MAX => DIV_TB, PAUSA_MAX => PAUSA_TB, ANODO_DEZENA => true, ANODO_UNIDADE => true )
         port map( clk => clk, rst => rst, seg_dezena => seg_dezena,
                   seg_unidade => seg_unidade, halted => halted );
 

@@ -3,7 +3,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity display_7seg is
-    generic( ANODO_COMUM : boolean := true );
+    generic( ANODO_DEZENA  : boolean := true;
+             ANODO_UNIDADE : boolean := false
+    );
     port( valor       : in  unsigned(15 downto 0);
           seg_dezena  : out std_logic_vector(6 downto 0);
           seg_unidade : out std_logic_vector(6 downto 0)
@@ -65,7 +67,7 @@ begin
                "0010000" when unidade = "1001" else
                "1111111";
 
-    seg_dezena  <= cod_dez when ANODO_COMUM else not cod_dez;
-    seg_unidade <= cod_uni when ANODO_COMUM else not cod_uni;
+    seg_dezena  <= cod_dez when ANODO_DEZENA else not cod_dez;
+    seg_unidade <= cod_uni when ANODO_UNIDADE else not cod_uni;
 
 end architecture;

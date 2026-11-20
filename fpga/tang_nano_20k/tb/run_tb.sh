@@ -40,7 +40,7 @@ else
     exit 1
 fi
 
-$G "$SRC/display_7seg.vhd" "$SRC/relogio.vhd" "$SRC/top_primos.vhd"
+$G "$TB_DIR/bufg_sim.vhd" "$SRC/display_7seg.vhd" "$SRC/relogio.vhd" "$SRC/top_primos.vhd"
 $G "$TB_DIR/display_7seg_tb.vhd" "$TB_DIR/top_primos_tb.vhd"
 
 FALHA=0
