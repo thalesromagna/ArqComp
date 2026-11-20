@@ -1,0 +1,40 @@
+; crivo.lst - gerado por montador.py a partir de crivo.asm
+; 29 palavras de 128
+;
+; end  opc  ddd sss ccccccc  hex    instrucao              destino          | fonte
+    0  0001_001_000_0000001  02401  ld r1, 1                                | ld r1, 1            ; n = 1
+;                                  preenche:
+    1  1011_001_001_0000000  16480  sw r1, (r1)                             | sw r1, (r1)         ; RAM[n] = n
+    2  1100_001_000_0000000  18400  inc r1                                  | inc r1              ; n++
+    3  1000_001_000_0100000  10420  cmpi r1, 32                             | cmpi r1, 32         ; n - 32
+    4  0101_000_000_1111101  0A07D  ble -3                 -> 1 (preenche)  | ble preenche        ; repete enquanto n <= 32
+    5  0001_001_000_0000010  02402  ld r1, 2                                | ld r1, 2            ; p = 2
+    6  0001_110_000_0000000  03800  ld r6, 0                                | ld r6, 0            ; r6 = 0 (valor para riscar)
+;                                  proximo_p:
+    7  1010_101_001_0000000  15480  lw r5, (r1)                             | lw r5, (r1)         ; r5 = RAM[p]
+    8  1000_101_000_0000000  11400  cmpi r5, 0                              | cmpi r5, 0
+    9  0101_000_000_0001000  0A008  ble 8                  -> 17 (avanca_p) | ble avanca_p        ; ja riscado (Z=1): nao e primo, pula
+   10  0010_100_001_0000000  05080  mov r4, r1                              | mov r4, r1
+   11  0011_100_001_0000000  07080  add r4, r1                              | add r4, r1          ; m = 2p
+   12  1111_000_000_0001111  1E00F  jmp 15                 -> 15 (testa_m)  | jmp testa_m
+;                                  risca:
+   13  1011_110_100_0000000  17A00  sw r6, (r4)                             | sw r6, (r4)         ; RAM[m] = 0
+   14  0011_100_001_0000000  07080  add r4, r1                              | add r4, r1          ; m = m + p
+;                                  testa_m:
+   15  1000_100_000_0100000  11020  cmpi r4, 32                             | cmpi r4, 32         ; m - 32
+   16  0101_000_000_1111101  0A07D  ble -3                 -> 13 (risca)    | ble risca           ; risca enquanto m <= 32
+;                                  avanca_p:
+   17  1100_001_000_0000000  18400  inc r1                                  | inc r1              ; p++
+   18  1000_001_000_0100000  10420  cmpi r1, 32                             | cmpi r1, 32         ; p - 32
+   19  0101_000_000_1110100  0A074  ble -12                -> 7 (proximo_p) | ble proximo_p       ; tenta todos os p ate 32
+   20  0001_011_000_0000010  02C02  ld r3, 2                                | ld r3, 2            ; ponteiro = 2
+;                                  le:
+   21  1010_101_011_0000000  15580  lw r5, (r3)                             | lw r5, (r3)         ; r5 = RAM[ponteiro]
+   22  1000_101_000_0000000  11400  cmpi r5, 0                              | cmpi r5, 0
+   23  0101_000_000_0000010  0A002  ble 2                  -> 25 (nao_primo) | ble nao_primo       ; zero (Z=1): riscado
+   24  0010_111_101_0000000  05E80  mov r7, r5                              | mov r7, r5          ; r7 = primo
+;                                  nao_primo:
+   25  1100_011_000_0000000  18C00  inc r3                                  | inc r3              ; ponteiro++
+   26  1000_011_000_0100000  10C20  cmpi r3, 32                             | cmpi r3, 32         ; ponteiro - 32
+   27  0101_000_000_1111010  0A07A  ble -6                 -> 21 (le)       | ble le              ; repete enquanto ponteiro <= 32
+   28  1101_000_000_0000000  1A000  halt                                    | halt

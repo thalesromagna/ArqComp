@@ -6,7 +6,8 @@ entity banco is
 	port (data_wr 					: in unsigned (15 downto 0);
 		  reg_wr, reg_r1, reg_r2 	: in unsigned (2 downto 0);
 		  clk, wr_en, rst			: in std_logic;
-		  data_r1, data_r2			: out unsigned (15 downto 0)
+		  data_r1, data_r2			: out unsigned (15 downto 0);
+		  data_r7					: out unsigned (15 downto 0)
 	);
 	
 end entity;
@@ -76,5 +77,7 @@ begin
 			   reg6 when reg_r2 = "110" else
 			   reg7 when reg_r2 = "111" else
 			   "0000000000000000";
+	
+	data_r7 <= reg7;
 	
 end architecture;

@@ -8,7 +8,9 @@ entity processador is
           estado    : out std_logic;
           pc        : out unsigned(6 downto 0);
           instrucao : out unsigned(16 downto 0);
-          ula_out   : out unsigned(15 downto 0)
+          ula_out   : out unsigned(15 downto 0);
+          r7_out    : out unsigned(15 downto 0);
+          halted    : out std_logic
     );
 end entity;
 
@@ -33,7 +35,9 @@ architecture a_processador of processador is
               sel_data_wr   : out unsigned(1 downto 0);
               branch_en     : out std_logic;
               delta         : out unsigned(6 downto 0);
-              wr_en_flags   : out std_logic
+              wr_en_flags   : out std_logic;
+              ram_wr_en     : out std_logic;
+              halt          : out std_logic
         );
     end component;
 
@@ -47,7 +51,9 @@ architecture a_processador of processador is
               carry_in                     : in  std_logic;
               sel_ula_b                    : in  std_logic;
               sel_data_wr                  : in  unsigned(1 downto 0);
-              zero, carry, overflow, sinal : out std_logic
+              zero, carry, overflow, sinal : out std_logic;
+              ram_data                     : in  unsigned(15 downto 0);
+              data_r7                      : out unsigned(15 downto 0)
         );
     end component;
 
@@ -74,6 +80,15 @@ architecture a_processador of processador is
         port( clk      : in  std_logic;
               endereco : in  unsigned(6 downto 0);
               dado     : out unsigned(16 downto 0)
+        );
+    end component;
+
+    component ram is
+        port( clk      : in  std_logic;
+              endereco : in  unsigned(6 downto 0);
+              wr_en    : in  std_logic;
+              dado_in  : in  unsigned(15 downto 0);
+              dado_out : out unsigned(15 downto 0)
         );
     end component;
 
@@ -105,6 +120,9 @@ architecture a_processador of processador is
 
     signal wr_en_flags_s                                            : std_logic;
     signal flag_zero_s, flag_sinal_s, flag_overflow_s, flag_carry_s : std_logic;
+
+    signal ram_wr_en_s, halt_s   : std_logic;
+    signal ram_data_s, data_r7_s : unsigned(15 downto 0);
 
 begin
 
@@ -150,7 +168,9 @@ begin
                       sel_data_wr   => sel_data_wr_s,
                       branch_en     => branch_en_s,
                       delta         => delta_s,
-                      wr_en_flags   => wr_en_flags_s );
+                      wr_en_flags   => wr_en_flags_s,
+                      ram_wr_en     => ram_wr_en_s,
+                      halt          => halt_s );
 
     banco_ula1: banco_ula port map( reg_wr      => reg_wr_s,
                                     reg_r1      => reg_r1_s,
@@ -169,7 +189,9 @@ begin
                                     zero        => zero_s,
                                     carry       => carry_s,
                                     overflow    => overflow_s,
-                                    sinal       => sinal_s );
+                                    sinal       => sinal_s,
+                                    ram_data    => ram_data_s,
+                                    data_r7     => data_r7_s );
 
     proto_uc1: proto_uc port map( clk       => clk,
                                   rst       => rst,
@@ -188,8 +210,16 @@ begin
                         endereco => pc_s,
                         dado     => instr_s );
 
+    ram1: ram port map( clk      => clk,
+                        endereco => data_r2_s(6 downto 0),
+                        wr_en    => ram_wr_en_s,
+                        dado_in  => data_r1_s,
+                        dado_out => ram_data_s );
+
     pc        <= pc_s;
     instrucao <= instr_s;
     estado    <= estado_s;
+    r7_out    <= data_r7_s;
+    halted    <= halt_s;
 
 end architecture;

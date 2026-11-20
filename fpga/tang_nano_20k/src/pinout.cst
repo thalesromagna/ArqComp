@@ -1,0 +1,51 @@
+// ==========================================
+// CLOCK E RESET
+// ==========================================
+IO_LOC "clk" 4;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+IO_LOC "rst" 88; // Botão S1
+IO_PORT "rst" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// ==========================================
+// DISPLAY DAS DEZENAS (seg_dezena)
+// Ordem do vetor: 6(g), 5(f), 4(e), 3(d), 2(c), 1(b), 0(a)
+// ==========================================
+IO_LOC "seg_dezena[6]" 15;
+IO_PORT "seg_dezena[6]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_dezena[5]" 16;
+IO_PORT "seg_dezena[5]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_dezena[4]" 17;
+IO_PORT "seg_dezena[4]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_dezena[3]" 18;
+IO_PORT "seg_dezena[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_dezena[2]" 19;
+IO_PORT "seg_dezena[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_dezena[1]" 20;
+IO_PORT "seg_dezena[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_dezena[0]" 25;
+IO_PORT "seg_dezena[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+
+// ==========================================
+// DISPLAY DAS UNIDADES (seg_unidade)
+// ==========================================
+IO_LOC "seg_unidade[6]" 26;
+IO_PORT "seg_unidade[6]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_unidade[5]" 27;
+IO_PORT "seg_unidade[5]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_unidade[4]" 28;
+IO_PORT "seg_unidade[4]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_unidade[3]" 29;
+IO_PORT "seg_unidade[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_unidade[2]" 30;
+IO_PORT "seg_unidade[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_unidade[1]" 31;
+IO_PORT "seg_unidade[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "seg_unidade[0]" 53;
+IO_PORT "seg_unidade[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+
+// ==========================================
+// LED OPCIONAL DE HALT (pino 77 = LCD_CLK, só vai ao conector FPC do LCD)
+// ==========================================
+IO_LOC "halted" 77;
+IO_PORT "halted" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;

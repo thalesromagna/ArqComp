@@ -10,6 +10,11 @@ BVC:  0110 xxx xxx rrrrrrr
 CMPR: 0111 ddd sss xxxxxxx
 CMPI: 1000 ddd xxx ccccccc
 SUBB: 1001 ddd sss xxxxxxx
+LW:   1010 ddd sss xxxxxxx
+SW:   1011 ddd sss xxxxxxx
+INC:  1100 ddd xxx xxxxxxx
+HALT: 1101 xxx xxx xxxxxxx
+      1110 xxx xxx xxxxxxx   (não usado: age como NOP)
 JMP:  1111 xxx xxx eeeeeee
 
 	ddd  identifica o registrador destino 
@@ -18,3 +23,11 @@ JMP:  1111 xxx xxx eeeeeee
 	rrrrrrr identifica o delta do salto relativo
 	eeeeeee identifica o endereço absoluto do salto
 	xxxx é irrelevante
+
+	LW Rd,(Rs):  Rd <- RAM[Rs(6..0)]   (sss = ponteiro, ddd = destino)
+	SW Rd,(Rs):  RAM[Rs(6..0)] <- Rd   (sss = ponteiro, ddd = dado)
+	INC Rd:      Rd <- Rd + 1
+	HALT:        congela o PC e levanta o pino halted até o reset
+
+	Alteram as flags (Z, N, V, C): ADD, SUB, SUBB, CMPR, CMPI
+	Não alteram as flags: NOP, LD, MOV, BLE, BVC, LW, SW, INC, HALT, JMP e o opcode 1110

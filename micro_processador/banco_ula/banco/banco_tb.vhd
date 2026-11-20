@@ -10,7 +10,8 @@ architecture a_banco_tb of banco_tb is
 		port (data_wr 					: in unsigned (15 downto 0);
 		      reg_wr, reg_r1, reg_r2 	: in unsigned (2 downto 0);
 			  clk, wr_en, rst			: in std_logic;
-			  data_r1, data_r2			: out unsigned (15 downto 0)
+			  data_r1, data_r2			: out unsigned (15 downto 0);
+			  data_r7					: out unsigned (15 downto 0)
 		);
 	end component;
 	
@@ -24,6 +25,7 @@ architecture a_banco_tb of banco_tb is
 	signal   data_wr     : unsigned(15 downto 0);
 	signal   data_r1     : unsigned(15 downto 0);
 	signal   data_r2     : unsigned(15 downto 0);
+	signal   data_r7     : unsigned(15 downto 0);
 begin
 	uut: banco port map ( data_wr => data_wr,
 	                      reg_wr  => reg_wr,
@@ -33,7 +35,8 @@ begin
 	                      wr_en   => wr_en,
 	                      rst     => reset,
 	                      data_r1 => data_r1,
-	                      data_r2 => data_r2
+	                      data_r2 => data_r2,
+	                      data_r7 => data_r7
 	                    );
     
     reset_global: process

@@ -1,0 +1,3 @@
+*.ghw
+*.cf
+__pycache__/

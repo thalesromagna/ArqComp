@@ -1,0 +1,26 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW2AR-18C" pn="GW2AR-LV18QN88C8/I7">gw2ar18c-000</Device>
+    <FileList>
+        <File path="src/processador/reg1bit.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/reg16bits.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/banco.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/ula.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/banco_ula.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/pc.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/somador.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/proto_uc.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/sm.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/ram.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/rom.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/uc.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/processador/processador.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/display_7seg.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/relogio.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/top_primos.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/pinout.cst" type="file.cst" enable="1"/>
+    </FileList>
+</Project>

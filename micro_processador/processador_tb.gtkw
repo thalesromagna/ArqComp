@@ -1,0 +1,51 @@
+[*]
+[*] GTKWave Analyzer v3.3.116
+[*]
+[dumpfile] "processador_tb.ghw"
+[savefile] "processador_tb.gtkw"
+[timestart] 0
+[size] 1600 900
+[pos] -1 -1
+*-27.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.processador_tb.
+[sst_width] 250
+[signals_width] 300
+[sst_expanded] 1
+[sst_vpaned_height] 250
+@28
+top.processador_tb.clk
+top.processador_tb.reset
+top.processador_tb.estado
+@24
+top.processador_tb.pc[6:0]
+@28
+top.processador_tb.instrucao[16:0]
+@424
+top.processador_tb.ula_out[15:0]
+top.processador_tb.r7_out[15:0]
+@28
+top.processador_tb.halted
+@424
+top.processador_tb.uut.banco_ula1.banco1.reg0[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg1[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg2[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg3[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg4[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg5[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg6[15:0]
+top.processador_tb.uut.banco_ula1.banco1.reg7[15:0]
+@28
+top.processador_tb.uut.flag_zero_s
+top.processador_tb.uut.flag_sinal_s
+top.processador_tb.uut.flag_carry_s
+top.processador_tb.uut.flag_overflow_s
+@24
+top.processador_tb.uut.ram1.endereco[6:0]
+@424
+top.processador_tb.uut.ram1.dado_in[15:0]
+top.processador_tb.uut.ram1.dado_out[15:0]
+@28
+top.processador_tb.uut.ram1.wr_en
+[pattern_trace] 1
+[pattern_trace] 0

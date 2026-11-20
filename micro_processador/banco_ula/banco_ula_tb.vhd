@@ -16,7 +16,9 @@ architecture a_banco_ula_tb of banco_ula_tb is
 			  carry_in                  : in std_logic;
 			  sel_ula_b					: in std_logic;
 			  sel_data_wr				: in unsigned (1 downto 0);
-			  zero, carry, overflow, sinal : out std_logic
+			  zero, carry, overflow, sinal : out std_logic;
+			  ram_data					: in unsigned(15 downto 0);
+			  data_r7					: out unsigned(15 downto 0)
 		);
 	end component;
 
@@ -32,6 +34,8 @@ architecture a_banco_ula_tb of banco_ula_tb is
 	signal carry_in                      : std_logic := '0';
 	signal constante                     : unsigned(15 downto 0);
 	signal ula_out, data_r1, data_r2     : unsigned(15 downto 0);
+	signal ram_data                      : unsigned(15 downto 0) := "0000000000000000";
+	signal data_r7                       : unsigned(15 downto 0);
 
 begin
 
@@ -52,7 +56,9 @@ begin
 	                          zero        => zero,
 	                          carry       => carry,
 	                          overflow    => overflow,
-	                          sinal       => sinal
+	                          sinal       => sinal,
+	                          ram_data    => ram_data,
+	                          data_r7     => data_r7
 	                        );
 
 	reset_global: process
@@ -113,9 +119,46 @@ begin
 		reg_r2      <= "010";
 		wait for 100 ns;
 
+		-- Lab 7: confere o ADD acima (r1 = 10 + 3)
+		assert data_r1 = x"000D" report "ADD: r1 deveria ser 13" severity error;
 
+		-- grava em r3 o dado vindo da RAM (sel_data_wr="11")
+		wr_en       <= '1';
+		sel_data_wr <= "11";
+		ram_data    <= x"A5C3";
+		constante   <= x"0007";
+		reg_wr      <= "011";
+		reg_r1      <= "011";
+		reg_r2      <= "010";
+		wait for 100 ns;
+		assert data_r1 = x"A5C3" report "LW: r3 nao recebeu ram_data" severity error;
+		assert data_r7 = x"0000" report "data_r7 mudou sem escrita em r7" severity error;
 
+		-- com wr_en='0' o dado da RAM nao entra
+		wr_en       <= '0';
+		ram_data    <= x"1234";
+		wait for 100 ns;
+		assert data_r1 = x"A5C3" report "wr_en=0: r3 foi sobrescrito" severity error;
 
+		-- grava em r7 vindo da RAM e confere data_r7
+		wr_en       <= '1';
+		ram_data    <= x"7E01";
+		reg_wr      <= "111";
+		reg_r2      <= "111";
+		wait for 100 ns;
+		assert data_r7 = x"7E01" report "data_r7 errado apos gravar em r7" severity error;
+		assert data_r2 = x"7E01" report "r7 lido por data_r2 errado" severity error;
+
+		-- gravar em outro registrador nao altera data_r7
+		ram_data    <= x"0F0F";
+		reg_wr      <= "100";
+		reg_r1      <= "100";
+		wait for 100 ns;
+		assert data_r1 = x"0F0F" report "LW: r4 nao recebeu ram_data" severity error;
+		assert data_r7 = x"7E01" report "data_r7 mudou ao gravar em r4" severity error;
+
+		wr_en       <= '0';
+		report "banco_ula_tb: fim dos testes" severity note;
 		wait;
 	end process;
 

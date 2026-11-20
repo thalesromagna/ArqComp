@@ -21,7 +21,9 @@ entity uc is
           sel_data_wr   : out unsigned(1 downto 0);
           branch_en     : out std_logic;
           delta         : out unsigned(6 downto 0);
-          wr_en_flags   : out std_logic
+          wr_en_flags   : out std_logic;
+          ram_wr_en     : out std_logic;
+          halt          : out std_logic
     );
 end entity;
 
@@ -31,6 +33,7 @@ architecture a_uc of uc is
     signal estado_s  : std_logic;
     signal opcode_s  : unsigned(3 downto 0);
     signal jump_en_s : std_logic;
+    signal halt_s    : std_logic;
 
 begin
 
@@ -42,13 +45,15 @@ begin
 
     reg_r2 <= instr_s(9 downto 7);
 
-    constante <= instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6 downto 0);
+    constante <= "0000000000000001" when opcode_s="1100" else -- INC
+                 instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6) & instr_s(6 downto 0);
 
     ULA_ctrl <= "00" when opcode_s="0011" else -- ADD
                 "01" when opcode_s="0100" else -- SUB
                 "01" when opcode_s="0111" else -- CMPR
                 "01" when opcode_s="1000" else -- CMPI
                 "11" when opcode_s="1001" else -- SUBB
+                "00" when opcode_s="1100" else -- INC
                 "00";
 
     wr_en_banco <= '1' when estado_s='1' and opcode_s="0001" else -- LD
@@ -56,7 +61,12 @@ begin
                    '1' when estado_s='1' and opcode_s="0011" else -- ADD
                    '1' when estado_s='1' and opcode_s="0100" else -- SUB
                    '1' when estado_s='1' and opcode_s="1001" else -- SUBB
+                   '1' when estado_s='1' and opcode_s="1010" else -- LW
+                   '1' when estado_s='1' and opcode_s="1100" else -- INC
                    '0';
+
+    ram_wr_en <= '1' when estado_s='1' and opcode_s="1011" else -- SW
+                 '0';
 
     wr_en_flags <= '1' when estado_s='1' and opcode_s="0011" else -- ADD
                    '1' when estado_s='1' and opcode_s="0100" else -- SUB
@@ -67,9 +77,11 @@ begin
 
     sel_data_wr <= "01" when opcode_s="0001" else -- LD
                    "10" when opcode_s="0010" else -- MOV
-                   "00"; -- ADD/SUB/SUBB
+                   "11" when opcode_s="1010" else -- LW
+                   "00"; -- ADD/SUB/SUBB/INC
 
     sel_ula_b <= '1' when opcode_s="1000" else -- CMPI
+                 '1' when opcode_s="1100" else -- INC
                  '0';
 
     branch_en <= '1' when opcode_s="0101" and flag_zero='1' else
@@ -83,10 +95,15 @@ begin
     jump_en_s <= '1' when opcode_s="1111" else
                  '0';
 
+    halt_s <= '1' when opcode_s="1101" else -- HALT
+              '0';
+
     instr_s  <= instrucao;
     estado_s <= estado;
 
-    pc_wr_en  <= estado_s;
+    pc_wr_en  <= '1' when estado_s='1' and halt_s='0' else
+                 '0';
+    halt      <= halt_s;
     jump_en   <= jump_en_s;
     jump_dest <= instr_s(6 downto 0);
 

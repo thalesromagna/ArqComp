@@ -13,7 +13,9 @@ entity banco_ula is
 		  carry_in                  : in std_logic;
 		  sel_ula_b					: in std_logic;
 		  sel_data_wr				: in unsigned(1 downto 0);
-		  zero, carry, overflow, sinal : out std_logic
+		  zero, carry, overflow, sinal : out std_logic;
+		  ram_data					: in unsigned(15 downto 0);
+		  data_r7					: out unsigned(15 downto 0)
 	);
 end entity;
 
@@ -24,7 +26,8 @@ architecture a_banco_ula of banco_ula is
 		port (data_wr 				: in unsigned (15 downto 0);
 		  reg_wr, reg_r1, reg_r2 	: in unsigned (2 downto 0);
 		  clk, wr_en, rst			: in std_logic;
-		  data_r1, data_r2			: out unsigned (15 downto 0)
+		  data_r1, data_r2			: out unsigned (15 downto 0);
+		  data_r7					: out unsigned (15 downto 0)
 	);
 	end component;
 
@@ -45,7 +48,7 @@ architecture a_banco_ula of banco_ula is
 
 begin
 
-	banco1: banco port map(data_wr => data_wr, reg_wr => reg_wr, reg_r1 => reg_r1, reg_r2 => reg_r2, clk => clk, wr_en => wr_en, rst => rst, data_r1 => data_r1_int, data_r2 => data_r2_int);
+	banco1: banco port map(data_wr => data_wr, reg_wr => reg_wr, reg_r1 => reg_r1, reg_r2 => reg_r2, clk => clk, wr_en => wr_en, rst => rst, data_r1 => data_r1_int, data_r2 => data_r2_int, data_r7 => data_r7);
 
 	ula_b <= data_r2_int when sel_ula_b='0' else
 	         constante   when sel_ula_b='1' else
@@ -56,6 +59,7 @@ begin
 	data_wr <= ula_out_int when sel_data_wr="00" else
 	           constante   when sel_data_wr="01" else
 			   data_r2_int when sel_data_wr="10" else
+			   ram_data    when sel_data_wr="11" else
 	           "0000000000000000";
 
 	data_r1 <= data_r1_int;
