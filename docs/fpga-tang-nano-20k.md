@@ -271,7 +271,92 @@ O testbench confere os códigos de 7 segmentos (2, 7, 13, 31), a pausa a cada mu
 | openFPGALoader não acha a placa no WSL | `usbipd attach` não foi feito (precisa refazer a cada reconexão) | `usbipd list` deve mostrar "Attached"; `lsusb` no WSL deve listar `0403:6010` |
 | Displays muito fracos | display azul/branco ou resistor maior | use display vermelho; não reduza o resistor abaixo de 220 ohms |
 
-## 9. Referências
+## 9. Variante: display de 4 dígitos (5641AS)
+
+Alternativa aos dois displays separados: um único display 5641AS (4 dígitos, catodo comum, multiplexado). O número aparece nos dois dígitos da direita, DIG3 = dezenas e DIG4 = unidades. O comportamento é o mesmo da seção 7; mudam a montagem e o bitstream (`src/top_primos_4dig.vhd` + `src/display_mux.vhd`, com os pinos em `src/pinout_4dig.cst`).
+
+### Material
+
+| Item | Qtde | Observação |
+|---|---|---|
+| Display 5641AS, 4 dígitos, 12 pinos, vermelho, **catodo comum** | 1 | substitui os dois 5161 |
+| Resistor 330 ohms | 14 | **dois em série por segmento** (R1 a R14) |
+| LED comum + resistor 330 ohms (R15) | 1 + 1 | opcional, indicador de HALT |
+| Jumpers macho-macho | ~15 | mínimo de 10 (veja abaixo) |
+
+### Por que multiplexar
+
+Um display de 4 dígitos tem 4 x 8 = 32 LEDs (7 segmentos + DP por dígito), mas só 12 pinos. Por dentro, o anodo do segmento "a" dos 4 dígitos é um fio só (pino 11), e o mesmo vale para b..g e DP. Cada dígito tem o seu próprio catodo comum: DIG1, DIG2, DIG3 e DIG4. Um segmento acende quando o pino dele está em '1' (3,3 V no anodo) **e** o pino do dígito está em '0' (0 V no catodo). Com o dígito em '1' não há diferença de tensão e ele fica apagado.
+
+Se a FPGA pusesse o padrão do "3" nos segmentos com DIG3 e DIG4 em '0', os dois dígitos mostrariam "3". Para mostrar números diferentes, ela acende **um dígito por vez**: coloca o padrão da dezena nos segmentos com DIG3 em '0' e DIG4 em '1' e espera 0,5 ms. Depois coloca o padrão da unidade com DIG4 em '0' e DIG3 em '1' e espera mais 0,5 ms, repetindo sem parar (27 MHz / 13500 = 2 kHz de troca, 1 kHz por dígito). O olho não percebe a troca e enxerga os dois dígitos acesos ao mesmo tempo (persistência da visão). O preço é o brilho: cada dígito fica aceso só metade do tempo. O ganho é usar 9 pinos (7 segmentos + 2 dígitos) em vez de 14.
+
+### Corrente: por que dois resistores por segmento
+
+Com 2 x 330 = 660 ohms, cada segmento recebe (3,3 - 1,9) / 660 ≈ 2,1 mA. Toda a corrente dos segmentos acesos de um dígito sai pelo pino daquele dígito: no "8" são 7 x 2,1 ≈ 15 mA. Por isso `dig[0]` e `dig[1]` usam `DRIVE=16` no `pinout_4dig.cst`. Com um só resistor de 330 por segmento seriam ≈ 4,2 mA por segmento e mais de 29 mA no pino do dígito. **Nunca use um só resistor de 330 por segmento, nunca ligue 5V.** O display não usa o 3V3 da placa. Os resistores ficam nos segmentos e não no dígito porque, com um resistor no catodo, o brilho mudaria conforme a quantidade de segmentos acesos.
+
+### Ligação
+
+Cada segmento: pino da FPGA, primeiro resistor (ímpar), segundo resistor (par), pino do display. Os dígitos vão direto, sem resistor. Posição no header como na seção 3 (contada a partir do USB-C).
+
+| Sinal | Pino FPGA | Header (lado, posição) | Resistores | Pino do display |
+|---|---|---|---|---|
+| a (`seg[0]`) | 25 | E10 | R1 + R2 (2 x 330) | 11 |
+| b (`seg[1]`) | 20 | E16 | R3 + R4 (2 x 330) | 7 |
+| c (`seg[2]`) | 19 | E17 | R5 + R6 (2 x 330) | 4 |
+| d (`seg[3]`) | 18 | E18 | R7 + R8 (2 x 330) | 2 |
+| e (`seg[4]`) | 17 | E15 | R9 + R10 (2 x 330) | 1 |
+| f (`seg[5]`) | 16 | E7 | R11 + R12 (2 x 330) | 10 |
+| g (`seg[6]`) | 15 | E6 | R13 + R14 (2 x 330) | 5 |
+| DIG3 = dezenas (`dig[1]`) | 26 | E11 | sem resistor | 8 |
+| DIG4 = unidades (`dig[0]`) | 27 | E8 | sem resistor | 6 |
+| HALT, LED opcional (`halted`) | 77 | E5 | R15 330 | LED, depois GND (E20) |
+| DIG1, DIG2, DP | - | - | - | 12, 9 e 3: sem ligação |
+
+Na protoboard, cada resistor pode ligar direto uma fileira à seguinte: do pino da FPGA ao R ímpar, dele ao R par em uma fileira livre e, da última fileira, um jumper até o pino do display. Assim são 7 jumpers de segmento + 2 de dígito + 1 do GND do LED de HALT = 10 no mínimo; tenha uns 15 para folga.
+
+Esquemático elétrico (gerado por `docs/esquematico/gerar_esquematico_4dig.py` a partir do `pinout_4dig.cst`, em [SVG](esquematico/esquematico_4dig.svg)):
+
+![Esquemático elétrico do display de 4 dígitos 5641AS e do LED de HALT](esquematico/esquematico_4dig.png)
+
+Pinagem do 5641AS (vista frontal, pontos decimais embaixo), [VALIDAR] com o teste abaixo:
+
+![Pinagem do display 5641AS](esquematico/pinagem_5641.png)
+
+### Teste da pinagem (antes de ligar na FPGA)
+
+Pinagem esperada [VALIDAR]: fileira de baixo, da esquerda para a direita, 1 = e, 2 = d, 3 = DP, 4 = c, 5 = g, 6 = DIG4; fileira de cima, da esquerda para a direita, 12 = DIG1, 11 = a, 10 = f, 9 = DIG2, 8 = DIG3, 7 = b. Com a placa só alimentada pelo USB (nenhum fio nos pinos de sinal):
+
+1. Ligue o pino **8** (DIG3) no **GND** (E20) com um jumper.
+2. Pegue um resistor de 330 ohms, ligue uma ponta no **3V3** (E19) e encoste a outra, uma de cada vez, nos pinos 11, 7, 4, 2, 1, 10, 5 e 3. Devem acender, no terceiro dígito, a, b, c, d, e, f, g e DP. Aqui um resistor só basta, porque acende um segmento por vez (≈ 4 mA).
+3. Passe o jumper do GND para o pino **6** (DIG4) e repita: os mesmos segmentos devem acender no quarto dígito.
+4. Se nada acender, o display pode ser anodo comum (5641BS), que não serve para esta montagem. Se um segmento ou dígito estiver em outro pino, corrija a coluna "Pino do display" acima antes de montar [VALIDAR].
+
+### Gerar e gravar
+
+Depois do passo 1 da seção 5 (`sh fpga/sincronizar.sh`), com a placa anexada ao WSL (seção 6, opção A):
+
+```bash
+sh fpga/tang_nano_20k/fluxo_aberto.sh 4dig gravar
+```
+
+Isso gera `fpga/tang_nano_20k/build_aberto/primos_4dig.fs` e grava na SRAM. Sem `gravar`, só gera o arquivo. Para voltar à variante de 2 displays (montagem da seção 3):
+
+```bash
+sh fpga/tang_nano_20k/fluxo_aberto.sh gravar
+```
+
+### Problemas comuns
+
+| Sintoma | Causa provável | O que fazer |
+|---|---|---|
+| Dígitos mais fracos que na variante de 2 displays | multiplexação (cada dígito aceso metade do tempo) e 2,1 mA por segmento | esperado; não troque os dois resistores por um só |
+| LEDs 0 a 5 da placa piscam ou brilham fraco | os pinos 15 a 20 também vão aos LEDs da placa, que acendem com o complemento dos segmentos | esperado |
+| Dígito errado aceso (unidade no lugar da dezena, número invertido) | DIG3 e DIG4 trocados | troque os jumpers dos pinos 8 e 6 do display (FPGA 26/E11 e 27/E8) |
+| Aparece no primeiro ou no segundo dígito | jumper do dígito no pino 12 ou 9 em vez de 8 ou 6 | confira a tabela de ligação |
+| Tudo apagado | pinagem diferente da esperada, display anodo comum ou dígito sem ligação | faça o teste da pinagem acima; confira se gravou o `primos_4dig.fs` |
+| Um número fica estranho (7 parece 1, 3 parece 9) | um segmento no pino errado | compare com a tabela e com o teste da pinagem |
+
+## 10. Referências
 
 - Datasheet Tang Nano 20K v1.3 (pinagem na página 5).
 - Wiki Sipeed, instalação do IDE: https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-Doc/install-the-ide.html

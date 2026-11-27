@@ -41,12 +41,14 @@ else
 fi
 
 $G "$TB_DIR/bufg_sim.vhd" "$SRC/display_7seg.vhd" "$SRC/relogio.vhd" "$SRC/top_primos.vhd"
+$G "$SRC/display_mux.vhd" "$SRC/top_primos_4dig.vhd"
 $G "$TB_DIR/display_7seg_tb.vhd" "$TB_DIR/top_primos_tb.vhd"
+$G "$TB_DIR/display_mux_tb.vhd" "$TB_DIR/top_primos_4dig_tb.vhd"
 
 FALHA=0
-for tb in display_7seg_tb top_primos_tb; do
+for tb in display_7seg_tb top_primos_tb display_mux_tb top_primos_4dig_tb; do
     echo "== $tb"
-    if ! ghdl -r --std=93c --workdir="$WORK" "$tb" --ieee-asserts=disable --assert-level=error > "$WORK/$tb.log" 2>&1; then
+    if ! (cd "$WORK" && ghdl -e --std=93c --workdir="$WORK" "$tb" && ghdl -r --std=93c --workdir="$WORK" "$tb" --ieee-asserts=disable --assert-level=error) > "$WORK/$tb.log" 2>&1; then
         FALHA=1
     fi
     grep -v "^$" "$WORK/$tb.log" | sed 's/^.*(report note): //'

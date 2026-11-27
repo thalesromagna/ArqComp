@@ -28,8 +28,9 @@ for f in reg1bit.vhd banco_ula/banco/reg16bits.vhd banco_ula/banco/banco.vhd ban
          ram.vhd "$ROM" uc/uc.vhd processador.vhd processador_tb.vhd; do
     ghdl -a --workdir="$WORK" "$f" || { echo "erro compilando $f"; exit 2; }
 done
-ghdl -e --workdir="$WORK" processador_tb || exit 2
-ghdl -r --workdir="$WORK" processador_tb --wave=processador_tb.ghw > "$WORK/sim.log" 2>&1
+DIR=$(pwd)
+(cd "$WORK" && ghdl -e --workdir="$WORK" processador_tb) || exit 2
+(cd "$WORK" && ghdl -r --workdir="$WORK" processador_tb --wave="$DIR/processador_tb.ghw") > "$WORK/sim.log" 2>&1
 
 sed -n 's/.*(report note): R7 //p' "$WORK/sim.log" > "$WORK/r7.txt"
 
