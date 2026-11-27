@@ -8,3 +8,6 @@ Fatos informados e marcos. Datas no formato AAAA-MM-DD.
 - 2026-11-20: Sergio pediu para tirar o item "Tabela do crivo começa no endereço 48"; ficam INC e HALT, e a tabela do crivo começa no endereço 0 (RAM[n] = n).
 - 2026-11-20: primeira gravação na SRAM da Tang Nano 20K pelo fluxo aberto (oss-cad-suite no WSL + usbipd); o `clk_proc` precisou de `BUFG` para fechar o hold.
 - 2026-11-20: os displays disponíveis são um 5161BS (anodo comum) e um 5161AS (catodo comum). Ficou 5161BS nas dezenas e 5161AS nas unidades (generics `ANODO_DEZENA = true`, `ANODO_UNIDADE = false`).
+- 2026-11-20: também há um display de 4 dígitos 5641AS (catodo comum). Decisão: variante extra multiplexada, só os 2 dígitos da direita, sem transistor (2 resistores de 330 ohms em série por segmento), mantendo a variante de 2 displays separados.
+- 2026-11-20: a equipe não tem protoboard. Opções: conseguir uma (recomendado) ou montar com jumpers fêmea-fêmea e emendas isoladas, preferindo o display de 4 dígitos (menos ligações).
+- 2026-11-23: a equipe conseguiu uma protoboard e montou os dois displays separados; dezenas funcionaram (apagado, 1, 2, 3), unidades apagadas.
